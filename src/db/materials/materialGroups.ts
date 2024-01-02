@@ -4,11 +4,11 @@ const MaterialGroupSchema = new mongoose.Schema(
     image: {
       public_id: {
         type: String,
-        required: true,
+        required: false,
       },
       url: {
         type: String,
-        required: true,
+        required: false,
       },
     },
     title: { type: String, required: true },
