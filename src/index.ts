@@ -29,7 +29,7 @@ server.listen(3001, () => {
 });
 
 mongoose.Promise = Promise;
-mongoose.connect(process.env.MONGO_URL!);
+mongoose.connect(process.env.MONGO_URL! as string);
 mongoose.connection.on("error", (error: Error) => console.log(error));
 
 app.use("/server", router());
