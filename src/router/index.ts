@@ -12,6 +12,7 @@ import partsGeneralIds from "./parts/partsGeneralIds";
 import partProviders from "./parts/partProviders";
 import getAll from "./getAll";
 import exhibition from "./exhibition";
+import messages from "./messages";
 const router = express.Router();
 
 export default (): express.Router => {
@@ -27,6 +28,7 @@ export default (): express.Router => {
   partProviders(router);
   getAll(router);
   exhibition(router);
+  messages(router);
 
   return router;
 };

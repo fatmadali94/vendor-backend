@@ -63,7 +63,20 @@ export const getMaterialProviders = () => {
   return materialProviders;
 };
 export const getMaterialProviderById = (id: any) =>
-  MaterialProviderModel.findById(id);
+  MaterialProviderModel.findById(id)
+    .populate({
+      path: "records.materialgroup",
+      model: "MaterialGroups", // Ensures that Mongoose knows which model to use for population
+    })
+    .populate({
+      path: "records.materialname",
+      model: "MaterialNames", // Similarly, define the model for material names
+    })
+    .populate({
+      path: "records.materialgrade",
+      model: "MaterialGrades", // And for material grades
+    })
+    .exec();
 
 export const deleteMaterialProviderById = (id: any) =>
   MaterialProviderModel.findOneAndDelete({ _id: id });
