@@ -2,37 +2,34 @@ import express from "express";
 var mongoose = require("mongoose");
 // const fs = require("fs");
 import {
-  getMaterialGrades,
-  getMaterialGradeById,
-  deleteMaterialGradeById,
-  updateMaterialGradeById,
-} from "../../db/materials/materialGrades";
-import { materialGradeModel } from "../../db/materials/materialGrades";
-import { difference } from "../../helpers";
-import { materialNameModel } from "../../db/materials/materialNames";
-import { MaterialProviderModel } from "../../db/materials/materialProviders";
+  getExhibitions,
+  getExhibitionById,
+  updateExhibitionById,
+  ExhibitionModel,
+  deleteExhibitionById,
+} from "../../db/exhibition";
 
 const cloudinary = require("../../utils/cloudinary");
 
-export const getAllMaterialGrades = async (
+export const getAllExhibitions = async (
   req: express.Request,
   res: express.Response
 ) => {
   try {
-    const materialGrades = await getMaterialGrades();
-    return res.status(200).json(materialGrades);
+    const exhibitions = await getExhibitions();
+    return res.status(200).json(exhibitions);
   } catch (error) {
     console.log(error);
     return res.sendStatus(400);
   }
 };
-export const deleteMaterialGrade = async (
+export const deleteExhibition = async (
   req: express.Request,
   res: express.Response
 ) => {
   try {
     const { id } = req.params;
-    const deletedMaterialGrade: any = await deleteMaterialGradeById(id);
+    const deletedMaterialGrade: any = await deleteExhibitionById(id);
     if (deletedMaterialGrade.image) {
       const imgId = deletedMaterialGrade.image.public_id;
       if (imgId) {
@@ -46,13 +43,13 @@ export const deleteMaterialGrade = async (
     return res.sendStatus(400);
   }
 };
-export const updateMaterialGrade = async (
+export const updateExhibition = async (
   req: express.Request,
   res: express.Response
 ) => {
   try {
     const _id = req.params.id;
-    const oldMaterialGrade: any = await materialGradeModel.findOne({ _id });
+    const oldMaterialGrade: any = await ExhibitionModel.findOne({ _id });
     const updatedMaterialGrade: any = {
       // ...req.body,
       title: req.body.title ? req.body.title : oldMaterialGrade.title,
@@ -87,15 +84,15 @@ export const updateMaterialGrade = async (
     res.sendStatus(400);
   }
 };
-export const createMaterialGrade = async (
+export const createExhibition = async (
   req: express.Request,
   res: express.Response
 ) => {
   try {
     const result = await cloudinary.uploader.upload(req.body.image, {
-      folder: "materialgrades",
+      folder: "exhibition",
     });
-    const newMaterialGrade = new materialGradeModel({
+    const newExhbition = new ExhibitionModel({
       ...req.body,
       image: {
         public_id: result.public_id,
@@ -103,20 +100,20 @@ export const createMaterialGrade = async (
       },
     });
 
-    await newMaterialGrade.save();
-    return res.status(200).json(newMaterialGrade).end();
+    await newExhbition.save();
+    return res.status(200).json(newExhbition).end();
   } catch (error) {
     console.log(error);
     res.sendStatus(400);
   }
 };
-export const getMaterialGrade = async (
+export const getExhibition = async (
   req: express.Request,
   res: express.Response
 ) => {
   try {
     const { id } = req.params;
-    const product = await getMaterialGradeById(id);
+    const product = await getExhibitionById(id);
     return res.status(200).json(product);
   } catch (error) {
     console.log(error);

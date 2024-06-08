@@ -14,20 +14,6 @@ const MaterialGradeSchema = new mongoose.Schema(
     slug: { type: String, required: false },
     title: { type: String, required: true },
     description: { type: String, required: true },
-    materialnames: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "MaterialNames",
-        required: true,
-      },
-    ],
-    materialproviders: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "MaterialProviders",
-        required: false,
-      },
-    ],
   },
   {
     timestamps: true,
@@ -38,8 +24,7 @@ export const materialGradeModel = mongoose.model(
   "MaterialGrades",
   MaterialGradeSchema
 );
-export const getMaterialGrades = () =>
-  materialGradeModel.find().populate("materialnames");
+export const getMaterialGrades = () => materialGradeModel.find();
 
 export const getMaterialGradeById = (id: string) =>
   materialGradeModel.findById(id);

@@ -104,15 +104,11 @@ export const updatePartsGeneralId = async (
         url: newImg.secure_url,
       };
     }
-    // if (!updatedPartGeneralId) {
-    //   return res.sendStatus(400);
-    // }
+
     const newPartNames: any = updatedPartGeneralId!.partnames || [];
-    // console.log(newPartNames, "newPartNames");
 
     const oldPartNames: any = oldPartGeneralId?.partnames;
-    // console.log(oldPartNames, "oldPartNames");
-    // these are new ids turned into objectIDs with looping
+
     let newPartNameIds = [];
     if (newPartNames !== "") {
       //   newPartNameIds = newPartNames.map(

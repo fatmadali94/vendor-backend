@@ -18,25 +18,20 @@ const MaterialProviderSchema = new mongoose.Schema(
     email: { type: String, required: false },
     phone: { type: Number, required: false },
     description: { type: String, required: false },
-    materialgrades: [
+    records: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "MaterialGrades",
-        required: false,
-      },
-    ],
-    materialnames: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "MaterialNames",
-        required: false,
-      },
-    ],
-    materialgroups: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "MaterialGroups",
-        required: false,
+        materialgroup: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "MaterialGroups",
+        },
+        materialname: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "MaterialNames",
+        },
+        materialgrade: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "MaterialGrades",
+        },
       },
     ],
   },
@@ -49,13 +44,26 @@ export const MaterialProviderModel = mongoose.model(
   "MaterialProviders",
   MaterialProviderSchema
 );
-export const getMaterialProviders = () =>
-  MaterialProviderModel.find().populate("materialgrades");
+export const getMaterialProviders = () => {
+  const materialProviders = MaterialProviderModel.find()
+    .populate({
+      path: "records.materialgroup",
+      model: "MaterialGroups", // Ensures that Mongoose knows which model to use for population
+    })
+    .populate({
+      path: "records.materialname",
+      model: "MaterialNames", // Similarly, define the model for material names
+    })
+    .populate({
+      path: "records.materialgrade",
+      model: "MaterialGrades", // And for material grades
+    })
+    .exec();
 
+  return materialProviders;
+};
 export const getMaterialProviderById = (id: any) =>
   MaterialProviderModel.findById(id);
 
 export const deleteMaterialProviderById = (id: any) =>
   MaterialProviderModel.findOneAndDelete({ _id: id });
-// export const updateMaterialProviderById = (id: string, values: Record<string, any>) =>
-//   MaterialProviderModel.findByIdAndUpdate(id, values);

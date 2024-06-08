@@ -1,10 +1,12 @@
 import express from "express";
-import { partGroupModel } from "../db/parts/partGroups";
-import { materialGroupModel } from "../db/materials/materialGroups";
 import { PartProviderModel } from "../db/parts/partProviders";
-import { partGeneralIdModel } from "../db/parts/partGeneralIds";
-import { materialGradeModel } from "../db/materials/materialGrades";
-import { MaterialProviderModel } from "../db/materials/materialProviders";
+import {
+  MaterialProviderModel,
+  getMaterialProviders,
+} from "../db/materials/materialProviders";
+import { getMaterialGroups } from "../db/materials/materialGroups";
+import { getMaterialGrades } from "../db/materials/materialGrades";
+import { getMaterialNames } from "../db/materials/materialNames";
 
 // export const getAllParts = () =>
 //   partGroupModel.find().populate({
@@ -27,11 +29,11 @@ import { MaterialProviderModel } from "../db/materials/materialProviders";
 //       },
 //     },
 //   });
-export const getAllMaterialProviders = () =>
-  MaterialProviderModel.find()
-    .populate({ path: "materialgrades", select: "title" })
-    .populate({ path: "materialgroups", select: "title" })
-    .populate({ path: "materialnames", select: "title" });
+// export const getAllMaterialProviders = () =>
+//   MaterialProviderModel.find()
+//     .populate("records.materialgroup")
+//     .populate("records.materialname")
+//     .populate("records.materialgrade");
 export const getAllPartProviders = () =>
   PartProviderModel.find()
     .populate({ path: "partgeneralids", select: "title" })
@@ -40,18 +42,20 @@ export const getAllPartProviders = () =>
 
 export const getAll = async (req: express.Request, res: express.Response) => {
   try {
-    // const parts = await getAllParts();
-    // console.log(parts);
-
-    // const materials = await getAllMaterials();
-    // console.log(materials);
-    const materialProviders = await getAllMaterialProviders();
+    const materialGroups = await getMaterialGroups();
+    const materialNames = await getMaterialNames();
+    const materialGrades = await getMaterialGrades();
+    const materialProviders = await getMaterialProviders();
     const partProviders = await getAllPartProviders();
-    // console.log(materialproviders);
     const allArray = {
       materialProviders,
       partProviders,
+      materialGrades,
+      materialGroups,
+      materialNames,
     };
+
+    console.log(materialProviders[0].records, "materialProviders");
 
     // return res.status(200).json(collections);
     return res.status(200).json(allArray);

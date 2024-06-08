@@ -169,7 +169,6 @@ export const createPartName = async (
       },
       // url + "/subcategory/" + (req as unknown as MulterRequest).file.filename,
     });
-    // console.log(newPartName);
 
     await newPartName.save();
 

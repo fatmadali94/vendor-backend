@@ -7,11 +7,6 @@ import {
   MaterialProviderModel,
 } from "../../db/materials/materialProviders";
 
-import { materialGradeModel } from "../../db/materials/materialGrades";
-import { materialNameModel } from "../../db/materials/materialNames";
-import { materialGroupModel } from "../../db/materials/materialGroups";
-import { difference } from "../../helpers";
-
 const cloudinary = require("../../utils/cloudinary");
 
 export const getAllProviders = async (
@@ -30,8 +25,6 @@ export const deleteProvider = async (
   req: express.Request,
   res: express.Response
 ) => {
-  // const url = req.protocol + "://" + req.get("host");
-
   try {
     const { id } = req.params;
     const provider: any = await deleteMaterialProviderById(id);
@@ -41,21 +34,6 @@ export const deleteProvider = async (
         await cloudinary.uploader.destroy(imgId);
       }
     }
-    // if (provider!.image) {
-    //   const prevImage = provider!.image.replace(url + "/", "");
-    //   fs.unlink("public/" + prevImage, (err: any) => {
-    //     if (err) {
-    //       throw err;
-    //     }
-
-    //     console.log("Delete File successfully.");
-    //   });
-    // }
-
-    await materialGradeModel.updateMany(
-      { _id: provider!.materialgrades },
-      { $pull: { providers: provider!._id } }
-    );
 
     return res.json(provider);
   } catch (error) {
@@ -71,13 +49,6 @@ export const updateProvider = async (
   }>,
   res: express.Response
 ) => {
-  // if (req.body || req.file || req.params) {
-  //   console.log(req.body, "body request");
-  //   console.log(req.params, "params request");
-  //   console.log(req.file, "file request");
-  // }
-  // const url = req.protocol + "://" + req.get("host");
-
   try {
     const _id = req.params.id;
     const oldProvider: any = await MaterialProviderModel.findOne({ _id });
@@ -113,54 +84,10 @@ export const updateProvider = async (
         url: newImg.secure_url,
       };
     }
-
-    const newMaterialGrades: any = updatedProvider!.materialgrades || [];
-    // const oldProvider = await ProviderModel.findOne({ _id });
-    const oldMaterialGrades = oldProvider!.materialgrades;
-
-    // these are new ids turned into objectIDs with looping
-
-    // const newMaterialGradeIds = newMaterialGrades.map(
-    //   (sub: { _id: string }) => new mongoose.Types.ObjectId(sub._id)
-    // );
-    let newMaterialGradeIds = [];
-    // if (newMaterialGrades instanceof Array) {
-    if (newMaterialGrades !== "") {
-      //   newMaterialGradeIds = newMaterialGrades!.map(
-      //     (sub: { _id: string }) => new mongoose.Types.ObjectId(sub._id)
-      //   );
-      // } else {
-      newMaterialGradeIds.push(new mongoose.Types.ObjectId(newMaterialGrades));
-    }
-    // if (oldProvider!.image) {
-    //   var prevImage = oldProvider!.image.replace(url + "/", "");
-    // }
     if (oldProvider) {
       Object.assign(oldProvider, updatedProvider);
     }
     const newProvider = await oldProvider!.save();
-
-    // if (oldProvider!.image) {
-    //   fs.unlink("public/" + prevImage!, (err: any) => {
-    //     if (err) {
-    //       throw err;
-    //     }
-
-    //     console.log("Delete File successfully.");
-    //   });
-    // }
-
-    const added = difference(newMaterialGradeIds, oldMaterialGrades);
-    const removed = difference(oldMaterialGrades, newMaterialGradeIds);
-
-    await materialGradeModel.updateMany(
-      { _id: removed },
-      { $pull: { providers: oldProvider!._id } }
-    );
-    await materialGradeModel.updateMany(
-      { _id: added },
-      { $addToSet: { providers: oldProvider!._id } }
-    );
 
     return res.status(200).json(newProvider).end();
   } catch (error) {
@@ -172,12 +99,11 @@ export const createProvider = async (
   req: express.Request<{ file: any }>,
   res: express.Response
 ) => {
-  // const url = req.protocol + "://" + req.get("host");
   try {
     const result = await cloudinary.uploader.upload(req.body.image, {
       folder: "providers",
     });
-    const newProvider = <any>new MaterialProviderModel({
+    const newProvider = new MaterialProviderModel({
       ...req.body,
       image: {
         public_id: result.public_id,
@@ -186,19 +112,6 @@ export const createProvider = async (
     });
 
     await newProvider.save();
-
-    await materialGradeModel.updateMany(
-      { _id: newProvider!.materialgrades },
-      { $addToSet: { materialproviders: newProvider!._id } }
-    );
-    await materialNameModel.updateMany(
-      { _id: newProvider!.materialnames },
-      { $addToSet: { materialproviders: newProvider!._id } }
-    );
-    await materialGroupModel.updateMany(
-      { _id: newProvider!.materialgroups },
-      { $addToSet: { materialproviders: newProvider!._id } }
-    );
     return res.status(200).json(newProvider!).end();
   } catch (error) {
     console.log(error);
@@ -211,7 +124,6 @@ export const getProvider = async (
 ) => {
   try {
     const { id } = req.params;
-
     const provider = await getMaterialProviderById(id);
     return res.status(200).json(provider);
   } catch (error) {

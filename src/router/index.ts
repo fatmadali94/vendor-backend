@@ -11,6 +11,7 @@ import partGroups from "./parts/partGroups";
 import partsGeneralIds from "./parts/partsGeneralIds";
 import partProviders from "./parts/partProviders";
 import getAll from "./getAll";
+import exhibition from "./exhibition";
 const router = express.Router();
 
 export default (): express.Router => {
@@ -25,6 +26,7 @@ export default (): express.Router => {
   partsGeneralIds(router);
   partProviders(router);
   getAll(router);
+  exhibition(router);
 
   return router;
 };
