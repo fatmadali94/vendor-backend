@@ -8,9 +8,6 @@ import {
   updateMaterialGradeById,
 } from "../../db/materials/materialGrades";
 import { materialGradeModel } from "../../db/materials/materialGrades";
-import { difference } from "../../helpers";
-import { materialNameModel } from "../../db/materials/materialNames";
-import { MaterialProviderModel } from "../../db/materials/materialProviders";
 
 const cloudinary = require("../../utils/cloudinary");
 

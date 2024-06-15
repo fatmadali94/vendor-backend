@@ -55,8 +55,6 @@ export const getAll = async (req: express.Request, res: express.Response) => {
       materialNames,
     };
 
-    console.log(materialProviders[0].records, "materialProviders");
-
     // return res.status(200).json(collections);
     return res.status(200).json(allArray);
   } catch (error) {

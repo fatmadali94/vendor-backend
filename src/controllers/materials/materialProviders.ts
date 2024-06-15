@@ -44,7 +44,6 @@ export const deleteProvider = async (
 export const updateProvider = async (
   req: express.Request<{
     id: any;
-
     params: any;
   }>,
   res: express.Response
@@ -52,26 +51,43 @@ export const updateProvider = async (
   try {
     const _id = req.params.id;
     const oldProvider: any = await MaterialProviderModel.findOne({ _id });
-
     const updatedProvider = <any>{
-      // ...req.body,
-      series: req.body.series ? req.body.series : oldProvider.series,
-      model: req.body.model ? req.body.model : oldProvider.model,
-      price: req.body.price ? req.body.price : oldProvider.price,
+      name: req.body.name ? req.body.name : oldProvider.name,
+      address: req.body.address ? req.body.address : oldProvider.address,
+      export_destination: req.body.export_destination
+        ? req.body.export_destination
+        : oldProvider.export_destination,
+      has_export: req.body.has_export
+        ? req.body.has_export
+        : oldProvider.has_export,
+      score: req.body.score ? req.body.score : oldProvider.score,
+      knowledge_based: req.body.knowledge_based
+        ? req.body.knowledge_based
+        : oldProvider.knowledge_based,
+      establish_year: req.body.establish_year
+        ? req.body.establish_year
+        : oldProvider.establish_year,
+      production_type: req.body.production_type
+        ? req.body.production_type
+        : oldProvider.production_type,
+      production_volume: req.body.production_volume
+        ? req.body.production_volume
+        : oldProvider.production_volume,
+      cooperation_length: req.body.cooperation_length
+        ? req.body.cooperation_length
+        : oldProvider.cooperation_length,
+      phone: req.body.phone ? req.body.phone : oldProvider.phone,
       description: req.body.description
         ? req.body.description
         : oldProvider.description,
-      features: req.body.features ? req.body.features : oldProvider.features,
-      slug: req.body.slug ? req.body.slug : oldProvider.slug,
-      instock: req.body.instock ? req.body.instock : oldProvider.instock,
-      materialgrades: req.body.materialgrades,
+      link: req.body.link ? req.body.link : oldProvider.link,
+      records: req.body.records ? req.body.records : oldProvider.records,
     };
 
     if (!updatedProvider) {
       return res.sendStatus(400);
     }
-    if (oldProvider.image !== "") {
-      // const imgId = oldMaterialGrade[0].image.public_id;
+    if (oldProvider.image !== "" && req.body.image) {
       const imgId = oldProvider.image.public_id;
       if (imgId) {
         await cloudinary.uploader.destroy(imgId);
@@ -100,16 +116,23 @@ export const createProvider = async (
   res: express.Response
 ) => {
   try {
-    const result = await cloudinary.uploader.upload(req.body.image, {
-      folder: "providers",
-    });
-    const newProvider = new MaterialProviderModel({
-      ...req.body,
-      image: {
-        public_id: result.public_id,
-        url: result.secure_url,
-      },
-    });
+    let newProvider = null;
+    if (req.body.image) {
+      const result = await cloudinary.uploader.upload(req.body.image, {
+        folder: "providers",
+      });
+      newProvider = new MaterialProviderModel({
+        ...req.body,
+        image: {
+          public_id: result.public_id,
+          url: result.secure_url,
+        },
+      });
+    } else {
+      newProvider = new MaterialProviderModel({
+        ...req.body,
+      });
+    }
 
     await newProvider.save();
     return res.status(200).json(newProvider!).end();
@@ -127,7 +150,6 @@ export const getProvider = async (
     const provider = await getMaterialProviderById(id);
     return res.status(200).json(provider);
   } catch (error) {
-    // console.log(error);
     res.sendStatus(400);
   }
 };
