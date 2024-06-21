@@ -1,16 +1,16 @@
 import express from "express";
 import {
-  getAllProviders,
-  deleteProvider,
-  updateProvider,
-  createProvider,
-  getProvider,
+  getAllPartProviders,
+  deletePartProvider,
+  updatePartProvider,
+  createPartProvider,
+  getPartProvider,
 } from "../../controllers/parts/partProviders";
 
 export default (router: express.Router) => [
-  router.get("/partProviders", getAllProviders),
-  router.get("/partProvider/:id", getProvider),
-  router.delete("/partProvider/:id", deleteProvider),
-  router.patch("/partProvider/:id", updateProvider),
-  router.post("/createPartProvider", createProvider),
+  router.get("/partProviders", getAllPartProviders),
+  router.get("/partProvider/:id", getPartProvider),
+  router.delete("/partProvider/:id", deletePartProvider),
+  router.patch("/partProvider/:id", updatePartProvider),
+  router.post("/createPartProvider", createPartProvider),
 ];

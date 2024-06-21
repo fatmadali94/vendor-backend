@@ -6,13 +6,10 @@ import {
   getPartProviders,
   PartProviderModel,
 } from "../../db/parts/partProviders";
-import { partGeneralIdModel } from "../../db/parts/partGeneralIds";
-import { difference } from "../../helpers";
-import { partNameModel } from "../../db/parts/partNames";
-import { partGroupModel } from "../../db/parts/partGroups";
+
 const cloudinary = require("../../utils/cloudinary");
 
-export const getAllProviders = async (
+export const getAllPartProviders = async (
   req: express.Request,
   res: express.Response
 ) => {
@@ -24,12 +21,11 @@ export const getAllProviders = async (
     return res.sendStatus(400);
   }
 };
-export const deleteProvider = async (
+
+export const deletePartProvider = async (
   req: express.Request,
   res: express.Response
 ) => {
-  // const url = req.protocol + "://" + req.get("host");
-
   try {
     const { id } = req.params;
     const provider: any = await deletePartProviderById(id);
@@ -40,21 +36,16 @@ export const deleteProvider = async (
       }
     }
 
-    await partGeneralIdModel.updateMany(
-      { _id: provider!.partgeneralids },
-      { $pull: { providers: provider!._id } }
-    );
-
     return res.json(provider);
   } catch (error) {
     console.log(error);
     return res.sendStatus(400);
   }
 };
-export const updateProvider = async (
+
+export const updatePartProvider = async (
   req: express.Request<{
     id: any;
-
     params: any;
   }>,
   res: express.Response
@@ -62,26 +53,43 @@ export const updateProvider = async (
   try {
     const _id = req.params.id;
     const oldProvider: any = await PartProviderModel.findOne({ _id });
-
     const updatedProvider = <any>{
-      // ...req.body,
-      series: req.body.series ? req.body.series : oldProvider.series,
-      model: req.body.model ? req.body.model : oldProvider.model,
-      price: req.body.price ? req.body.price : oldProvider.price,
+      name: req.body.name ? req.body.name : oldProvider.name,
+      address: req.body.address ? req.body.address : oldProvider.address,
+      export_destination: req.body.export_destination
+        ? req.body.export_destination
+        : oldProvider.export_destination,
+      has_export: req.body.has_export
+        ? req.body.has_export
+        : oldProvider.has_export,
+      score: req.body.score ? req.body.score : oldProvider.score,
+      knowledge_based: req.body.knowledge_based
+        ? req.body.knowledge_based
+        : oldProvider.knowledge_based,
+      establish_year: req.body.establish_year
+        ? req.body.establish_year
+        : oldProvider.establish_year,
+      production_type: req.body.production_type
+        ? req.body.production_type
+        : oldProvider.production_type,
+      production_volume: req.body.production_volume
+        ? req.body.production_volume
+        : oldProvider.production_volume,
+      cooperation_length: req.body.cooperation_length
+        ? req.body.cooperation_length
+        : oldProvider.cooperation_length,
+      phone: req.body.phone ? req.body.phone : oldProvider.phone,
       description: req.body.description
         ? req.body.description
         : oldProvider.description,
-      features: req.body.features ? req.body.features : oldProvider.features,
-      slug: req.body.slug ? req.body.slug : oldProvider.slug,
-      instock: req.body.instock ? req.body.instock : oldProvider.instock,
-      partgeneralids: req.body.partgeneralids,
+      link: req.body.link ? req.body.link : oldProvider.link,
+      records: req.body.records ? req.body.records : oldProvider.records,
     };
 
     if (!updatedProvider) {
       return res.sendStatus(400);
     }
-    if (oldProvider.image !== "") {
-      // const imgId = oldPartGeneralId[0].image.public_id;
+    if (oldProvider.image !== "" && req.body.image) {
       const imgId = oldProvider.image.public_id;
       if (imgId) {
         await cloudinary.uploader.destroy(imgId);
@@ -94,33 +102,10 @@ export const updateProvider = async (
         url: newImg.secure_url,
       };
     }
-
-    const newPartGeneralIds: any = updatedProvider!.partgeneralids || [];
-    // const oldProvider = await ProviderModel.findOne({ _id });
-    const oldPartGeneralIds = oldProvider!.partgeneralids;
-
-    let newPartGeneralIdIds = [];
-    // if (newPartGeneralIds instanceof Array) {
-    if (newPartGeneralIds !== "") {
-      newPartGeneralIdIds.push(new mongoose.Types.ObjectId(newPartGeneralIds));
-    }
-
     if (oldProvider) {
       Object.assign(oldProvider, updatedProvider);
     }
     const newProvider = await oldProvider!.save();
-
-    const added = difference(newPartGeneralIdIds, oldPartGeneralIds);
-    const removed = difference(oldPartGeneralIds, newPartGeneralIdIds);
-
-    await partGeneralIdModel.updateMany(
-      { _id: removed },
-      { $pull: { providers: oldProvider!._id } }
-    );
-    await partGeneralIdModel.updateMany(
-      { _id: added },
-      { $addToSet: { providers: oldProvider!._id } }
-    );
 
     return res.status(200).json(newProvider).end();
   } catch (error) {
@@ -128,56 +113,47 @@ export const updateProvider = async (
     res.sendStatus(400);
   }
 };
-export const createProvider = async (
+
+export const createPartProvider = async (
   req: express.Request<{ file: any }>,
   res: express.Response
 ) => {
-  // const url = req.protocol + "://" + req.get("host");
   try {
-    const result = await cloudinary.uploader.upload(req.body.image, {
-      folder: "providers",
-    });
-    const newProvider = <any>new PartProviderModel({
-      ...req.body,
-      image: {
-        public_id: result.public_id,
-        url: result.secure_url,
-      },
-    });
+    let newProvider = null;
+    if (req.body.image) {
+      const result = await cloudinary.uploader.upload(req.body.image, {
+        folder: "partProviders",
+      });
+      newProvider = new PartProviderModel({
+        ...req.body,
+        image: {
+          public_id: result.public_id,
+          url: result.secure_url,
+        },
+      });
+    } else {
+      newProvider = new PartProviderModel({
+        ...req.body,
+      });
+    }
 
     await newProvider.save();
-
-    await partGeneralIdModel.updateMany(
-      { _id: newProvider!.partgeneralids },
-      { $addToSet: { partproviders: newProvider!._id } }
-    );
-
-    await partNameModel.updateMany(
-      { _id: newProvider!.partnames },
-      { $addToSet: { partproviders: newProvider!._id } }
-    );
-    await partGroupModel.updateMany(
-      { _id: newProvider!.partgroups },
-      { $addToSet: { partproviders: newProvider!._id } }
-    );
-
     return res.status(200).json(newProvider!).end();
   } catch (error) {
     console.log(error);
     res.sendStatus(400);
   }
 };
-export const getProvider = async (
+
+export const getPartProvider = async (
   req: express.Request,
   res: express.Response
 ) => {
   try {
     const { id } = req.params;
-
     const provider = await getPartProviderById(id);
     return res.status(200).json(provider);
   } catch (error) {
-    // console.log(error);
     res.sendStatus(400);
   }
 };

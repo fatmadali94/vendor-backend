@@ -3,9 +3,9 @@ var mongoose = require("mongoose");
 
 import {
   getMaterialNames,
-  getMaterialNameById,
+  // getMaterialNameById,
   deleteMaterialNameById,
-  updateMaterialNameById,
+  // updateMaterialNameById,
 } from "../../db/materials/materialNames";
 import { materialNameModel } from "../../db/materials/materialNames";
 
@@ -23,6 +23,7 @@ export const getAllMaterialNames = async (
     return res.sendStatus(400);
   }
 };
+
 export const deleteMaterialName = async (
   req: express.Request,
   res: express.Response
@@ -42,47 +43,7 @@ export const deleteMaterialName = async (
     return res.sendStatus(400);
   }
 };
-export const updateMaterialName = async (
-  req: express.Request,
-  res: express.Response
-) => {
-  try {
-    const _id = req.params.id;
-    const oldMaterialName: any = await materialNameModel.findOne({ _id });
-    const updatedMaterialName: any = {
-      title: req.body.title ? req.body.title : oldMaterialName.title,
-      description: req.body.description
-        ? req.body.description
-        : oldMaterialName.description,
-      slug: req.body.slug ? req.body.slug : oldMaterialName.slug,
-    };
-    if (oldMaterialName.image !== "") {
-      // const imgId = oldMaterialName[0].image.public_id;
-      const imgId = oldMaterialName.image.public_id;
-      if (imgId) {
-        await cloudinary.uploader.destroy(imgId);
-      }
-      const newImg = await cloudinary.uploader.upload(req.body.image, {
-        folder: "materialnames",
-      });
-      updatedMaterialName.image = {
-        public_id: newImg.public_id,
-        url: newImg.secure_url,
-      };
-    }
 
-    if (oldMaterialName) {
-      Object.assign(oldMaterialName, updatedMaterialName);
-    }
-
-    const newMaterialName = await oldMaterialName!.save();
-
-    return res.status(200).json(newMaterialName).end();
-  } catch (error) {
-    console.log(error);
-    res.sendStatus(400);
-  }
-};
 export const createMaterialName = async (
   req: express.Request,
   res: express.Response
@@ -108,16 +69,59 @@ export const createMaterialName = async (
     res.sendStatus(400);
   }
 };
-export const getMaterialName = async (
-  req: express.Request,
-  res: express.Response
-) => {
-  try {
-    const { id } = req.params;
-    const product = await getMaterialNameById(id);
-    return res.status(200).json(product);
-  } catch (error) {
-    console.log(error);
-    res.sendStatus(400);
-  }
-};
+
+// export const getMaterialName = async (
+//   req: express.Request,
+//   res: express.Response
+// ) => {
+//   try {
+//     const { id } = req.params;
+//     const product = await getMaterialNameById(id);
+//     return res.status(200).json(product);
+//   } catch (error) {
+//     console.log(error);
+//     res.sendStatus(400);
+//   }
+// };
+
+// export const updateMaterialName = async (
+//   req: express.Request,
+//   res: express.Response
+// ) => {
+//   try {
+//     const _id = req.params.id;
+//     const oldMaterialName: any = await materialNameModel.findOne({ _id });
+//     const updatedMaterialName: any = {
+//       title: req.body.title ? req.body.title : oldMaterialName.title,
+//       description: req.body.description
+//         ? req.body.description
+//         : oldMaterialName.description,
+//       slug: req.body.slug ? req.body.slug : oldMaterialName.slug,
+//     };
+//     if (oldMaterialName.image !== "") {
+//       // const imgId = oldMaterialName[0].image.public_id;
+//       const imgId = oldMaterialName.image.public_id;
+//       if (imgId) {
+//         await cloudinary.uploader.destroy(imgId);
+//       }
+//       const newImg = await cloudinary.uploader.upload(req.body.image, {
+//         folder: "materialnames",
+//       });
+//       updatedMaterialName.image = {
+//         public_id: newImg.public_id,
+//         url: newImg.secure_url,
+//       };
+//     }
+
+//     if (oldMaterialName) {
+//       Object.assign(oldMaterialName, updatedMaterialName);
+//     }
+
+//     const newMaterialName = await oldMaterialName!.save();
+
+//     return res.status(200).json(newMaterialName).end();
+//   } catch (error) {
+//     console.log(error);
+//     res.sendStatus(400);
+//   }
+// };

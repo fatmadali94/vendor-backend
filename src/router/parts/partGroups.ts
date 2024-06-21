@@ -1,20 +1,16 @@
 import express from "express";
 import {
   getAllPartGroups,
-  getPartGroup,
   deletePartGroup,
-  updatePartGroup,
   createPartGroup,
+  // getMaterialGroup,
+  // updateMaterialGroup,
 } from "../../controllers/parts/partGroups";
 
 export default (router: express.Router) => [
   router.get("/partGroups", getAllPartGroups),
-  router.get("/partGroup/:id", getPartGroup),
-  router.delete(
-    "/partGroup/:id",
-
-    deletePartGroup
-  ),
-  router.patch("/partGroup/:id", updatePartGroup),
+  router.delete("/partGroup/:id", deletePartGroup),
   router.post("/createPartGroup", createPartGroup),
+  // router.patch("/materialGroup/:id", updateMaterialGroup),
+  // router.get("/materialGroup/:id", getMaterialGroup),
 ];

@@ -13,6 +13,7 @@ import partProviders from "./parts/partProviders";
 import getAll from "./getAll";
 import exhibition from "./exhibition";
 import messages from "./messages";
+import offer from "./offer";
 const router = express.Router();
 
 export default (): express.Router => {
@@ -29,6 +30,7 @@ export default (): express.Router => {
   getAll(router);
   exhibition(router);
   messages(router);
+  offer(router);
 
   return router;
 };

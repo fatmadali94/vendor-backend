@@ -2,13 +2,10 @@ import express from "express";
 import {
   deleteMaterialGroupById,
   getMaterialGroups,
-  getMaterialGroupById,
-  updateMaterialGroupById,
+  // getMaterialGroupById,
+  // updateMaterialGroupById,
   materialGroupModel,
 } from "../../db/materials/materialGroups";
-import { materialNameModel } from "../../db/materials/materialNames";
-// const multer = require("multer");
-// const fs = require("fs");
 const cloudinary = require("../../utils/cloudinary");
 
 interface MulterRequest extends express.Request {
@@ -31,11 +28,9 @@ export const deleteMaterialGroup = async (
   req: express.Request,
   res: express.Response
 ) => {
-  // const url = req.protocol + "://" + req.get("host");
   try {
     const { id } = req.params;
     const deletedMaterialGroup: any = await deleteMaterialGroupById(id);
-    // console.log(deletedMaterialGroup, "deleted materialGroup");
 
     if (deletedMaterialGroup.image) {
       const imgId = deletedMaterialGroup.image.public_id;
@@ -50,49 +45,48 @@ export const deleteMaterialGroup = async (
   }
 };
 
-export const updateMaterialGroup = async (
-  req: express.Request,
-  res: express.Response
-) => {
-  try {
-    const { id } = req.params;
-    const previousMaterialGroup: any = await materialGroupModel.find({
-      _id: id,
-    });
+// export const updateMaterialGroup = async (
+//   req: express.Request,
+//   res: express.Response
+// ) => {
+//   try {
+//     const { id } = req.params;
+//     const previousMaterialGroup: any = await materialGroupModel.find({
+//       _id: id,
+//     });
 
-    const updatedMaterialGroup: any = {
-      title: req.body.title ? req.body.title : previousMaterialGroup[0]?.title,
-      description: req.body.description
-        ? req.body.description
-        : previousMaterialGroup[0]?.description,
-      materialnames: previousMaterialGroup[0]?.materialnames,
-    };
+//     const updatedMaterialGroup: any = {
+//       title: req.body.title ? req.body.title : previousMaterialGroup[0]?.title,
+//       description: req.body.description
+//         ? req.body.description
+//         : previousMaterialGroup[0]?.description,
+//     };
 
-    if (previousMaterialGroup.image !== "") {
-      const imgId = previousMaterialGroup[0].image.public_id;
-      if (imgId) {
-        await cloudinary.uploader.destroy(imgId);
-      }
-      const newImg = await cloudinary.uploader.upload(req.body.image, {
-        folder: "materialGroups",
-      });
-      updatedMaterialGroup.image = {
-        public_id: newImg.public_id,
-        url: newImg.secure_url,
-      };
-    }
+//     if (previousMaterialGroup.image !== "") {
+//       const imgId = previousMaterialGroup[0].image.public_id;
+//       if (imgId) {
+//         await cloudinary.uploader.destroy(imgId);
+//       }
+//       const newImg = await cloudinary.uploader.upload(req.body.image, {
+//         folder: "materialGroups",
+//       });
+//       updatedMaterialGroup.image = {
+//         public_id: newImg.public_id,
+//         url: newImg.secure_url,
+//       };
+//     }
 
-    const newMaterialGroup = await updateMaterialGroupById(
-      id,
-      updatedMaterialGroup
-    );
+//     const newMaterialGroup = await updateMaterialGroupById(
+//       id,
+//       updatedMaterialGroup
+//     );
 
-    return res.status(200).json(newMaterialGroup).end();
-  } catch (error) {
-    console.log(error);
-    res.sendStatus(400);
-  }
-};
+//     return res.status(200).json(newMaterialGroup).end();
+//   } catch (error) {
+//     console.log(error);
+//     res.sendStatus(400);
+//   }
+// };
 
 export const createMaterialGroup = async (
   req: express.Request,
@@ -118,18 +112,18 @@ export const createMaterialGroup = async (
     res.sendStatus(400);
   }
 };
-export const getMaterialGroup = async (
-  req: express.Request,
-  res: express.Response
-) => {
-  try {
-    const { id } = req.params;
 
-    const materialGroup = await getMaterialGroupById(id);
+// export const getMaterialGroup = async (
+//   req: express.Request,
+//   res: express.Response
+// ) => {
+//   try {
+//     const { id } = req.params;
 
-    return res.status(200).json(materialGroup);
-  } catch (error) {
-    // console.log(error);
-    res.sendStatus(400);
-  }
-};
+//     const materialGroup = await getMaterialGroupById(id);
+
+//     return res.status(200).json(materialGroup);
+//   } catch (error) {
+//     res.sendStatus(400);
+//   }
+// };

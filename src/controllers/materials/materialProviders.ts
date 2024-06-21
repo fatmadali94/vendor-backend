@@ -21,6 +21,7 @@ export const getAllProviders = async (
     return res.sendStatus(400);
   }
 };
+
 export const deleteProvider = async (
   req: express.Request,
   res: express.Response
@@ -41,6 +42,7 @@ export const deleteProvider = async (
     return res.sendStatus(400);
   }
 };
+
 export const updateProvider = async (
   req: express.Request<{
     id: any;
@@ -111,6 +113,7 @@ export const updateProvider = async (
     res.sendStatus(400);
   }
 };
+
 export const createProvider = async (
   req: express.Request<{ file: any }>,
   res: express.Response
@@ -141,6 +144,7 @@ export const createProvider = async (
     res.sendStatus(400);
   }
 };
+
 export const getProvider = async (
   req: express.Request,
   res: express.Response
