@@ -24,7 +24,7 @@ app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 
 const server = http.createServer(app);
-server.listen(3004, () => {
+server.listen(3003, () => {
   console.log("server running on http://localhost:3004/");
   console.log("working great");
 });
