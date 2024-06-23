@@ -36,9 +36,19 @@ import { getMaterialNames } from "../db/materials/materialNames";
 //     .populate("records.materialgrade");
 export const getAllPartProviders = () =>
   PartProviderModel.find()
-    .populate({ path: "partgeneralids", select: "title" })
-    .populate({ path: "partnames", select: "title" })
-    .populate({ path: "partgroups", select: "title" });
+    .populate({
+      path: "records.partgroup",
+      model: "PartGroups", // Ensures that Mongoose knows which model to use for population
+    })
+    .populate({
+      path: "records.partname",
+      model: "PartNames", // Similarly, define the model for material names
+    })
+    .populate({
+      path: "records.partgeneralid",
+      model: "PartGeneralIds", // And for material grades
+    })
+    .exec();
 
 export const getAll = async (req: express.Request, res: express.Response) => {
   try {

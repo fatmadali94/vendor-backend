@@ -40,7 +40,7 @@ const PartProviderSchema = new mongoose.Schema(
           ref: "PartGroups",
           required: false,
         },
-        materialname: {
+        partname: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "PartNames",
           required: false,
