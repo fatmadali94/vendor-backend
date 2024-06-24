@@ -59,13 +59,15 @@ export const updateProvider = async (
       export_destination: req.body.export_destination
         ? req.body.export_destination
         : oldProvider.export_destination,
-      has_export: req.body.has_export
-        ? req.body.has_export
-        : oldProvider.has_export,
+      has_export:
+        req.body.has_export !== undefined
+          ? req.body.has_export
+          : oldProvider.has_export,
       score: req.body.score ? req.body.score : oldProvider.score,
-      knowledge_based: req.body.knowledge_based
-        ? req.body.knowledge_based
-        : oldProvider.knowledge_based,
+      knowledge_based:
+        req.body.knowledge_based !== undefined
+          ? req.body.knowledge_based
+          : oldProvider.knowledge_based,
       establish_year: req.body.establish_year
         ? req.body.establish_year
         : oldProvider.establish_year,

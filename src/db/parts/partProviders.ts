@@ -63,20 +63,20 @@ export const PartProviderModel = mongoose.model(
   PartProviderSchema
 );
 export const getPartProviders = () => {
-  const partProviders = PartProviderModel.find();
-  // .populate({
-  //   path: "records.partgroup",
-  //   model: "PartGroups", // Ensures that Mongoose knows which model to use for population
-  // })
-  // .populate({
-  //   path: "records.partname",
-  //   model: "PartNames", // Similarly, define the model for material names
-  // })
-  // .populate({
-  //   path: "records.partgeneralid",
-  //   model: "PartGeneralIds", // And for material grades
-  // })
-  // .exec();
+  const partProviders = PartProviderModel.find()
+    .populate({
+      path: "records.partgroup",
+      model: "PartGroups", // Ensures that Mongoose knows which model to use for population
+    })
+    .populate({
+      path: "records.partname",
+      model: "PartNames", // Similarly, define the model for material names
+    })
+    .populate({
+      path: "records.partgeneralid",
+      model: "PartGeneralIds", // And for material grades
+    })
+    .exec();
 
   return partProviders;
 };
@@ -92,7 +92,7 @@ export const getPartProviderById = (id: any) =>
     })
     .populate({
       path: "records.partgeneralid",
-      model: "PartGrades", // And for material grades
+      model: "PartGeneralIds", // And for material grades
     })
     .exec();
 

@@ -53,19 +53,22 @@ export const updatePartProvider = async (
   try {
     const _id = req.params.id;
     const oldProvider: any = await PartProviderModel.findOne({ _id });
+
     const updatedProvider = <any>{
       name: req.body.name ? req.body.name : oldProvider.name,
       address: req.body.address ? req.body.address : oldProvider.address,
       export_destination: req.body.export_destination
         ? req.body.export_destination
         : oldProvider.export_destination,
-      has_export: req.body.has_export
-        ? req.body.has_export
-        : oldProvider.has_export,
+      has_export:
+        req.body.has_export !== undefined
+          ? req.body.has_export
+          : oldProvider.has_export,
       score: req.body.score ? req.body.score : oldProvider.score,
-      knowledge_based: req.body.knowledge_based
-        ? req.body.knowledge_based
-        : oldProvider.knowledge_based,
+      knowledge_based:
+        req.body.knowledge_based !== undefined
+          ? req.body.knowledge_based
+          : oldProvider.knowledge_based,
       establish_year: req.body.establish_year
         ? req.body.establish_year
         : oldProvider.establish_year,
@@ -118,6 +121,8 @@ export const createPartProvider = async (
   req: express.Request<{ file: any }>,
   res: express.Response
 ) => {
+  console.log("EHLLOOO");
+
   try {
     let newProvider = null;
     if (req.body.image) {

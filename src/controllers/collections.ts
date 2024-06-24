@@ -7,6 +7,9 @@ import {
 import { getMaterialGroups } from "../db/materials/materialGroups";
 import { getMaterialGrades } from "../db/materials/materialGrades";
 import { getMaterialNames } from "../db/materials/materialNames";
+import { getPartGroups } from "../db/parts/partGroups";
+import { getPartGeneralIds } from "../db/parts/partGeneralIds";
+import { getPartNames } from "../db/parts/partNames";
 
 // export const getAllParts = () =>
 //   partGroupModel.find().populate({
@@ -55,6 +58,9 @@ export const getAll = async (req: express.Request, res: express.Response) => {
     const materialGroups = await getMaterialGroups();
     const materialNames = await getMaterialNames();
     const materialGrades = await getMaterialGrades();
+    const partGroups = await getPartGroups();
+    const partNames = await getPartNames();
+    const partGeneralIds = await getPartGeneralIds();
     const materialProviders = await getMaterialProviders();
     const partProviders = await getAllPartProviders();
     const allArray = {
@@ -63,9 +69,10 @@ export const getAll = async (req: express.Request, res: express.Response) => {
       materialGrades,
       materialGroups,
       materialNames,
+      partGroups,
+      partNames,
+      partGeneralIds,
     };
-
-    // return res.status(200).json(collections);
     return res.status(200).json(allArray);
   } catch (error) {
     console.log(error);
