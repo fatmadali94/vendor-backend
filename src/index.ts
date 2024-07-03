@@ -3,7 +3,7 @@ import http from "http";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import compression from "compression";
-import cors from "cors";
+// import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import crypto from "crypto";
@@ -14,13 +14,6 @@ import router from "./router";
 dotenv.config();
 
 const app = express();
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", req.headers.origin);
-  res.header("Access-Control-Allow-Credentials", "true");
-  res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type");
-  next();
-});
 
 app.use(express.static("public"));
 app.use(compression());
