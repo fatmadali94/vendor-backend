@@ -121,8 +121,6 @@ export const createPartProvider = async (
   req: express.Request<{ file: any }>,
   res: express.Response
 ) => {
-  console.log("EHLLOOO");
-
   try {
     let newProvider = null;
     if (req.body.image) {

@@ -22,7 +22,6 @@ export const createOffer = async (
   req: express.Request,
   res: express.Response
 ) => {
-  console.log(req.body, "Req body");
   try {
     const result = await cloudinary.uploader.upload(req.body.image, {
       folder: "offer",
@@ -34,8 +33,6 @@ export const createOffer = async (
         url: result.secure_url,
       },
     });
-
-    console.log(newOffer, "New Offer");
 
     await newOffer.save();
     const transporter = nodemailer.createTransport({

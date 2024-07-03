@@ -12,9 +12,13 @@ import crypto from "crypto";
 
 import router from "./router";
 dotenv.config();
+const corsOptions = {
+  origin: true, // allow requests from any domain
+  credentials: true, // allow cookies to be sent with requests
+};
 
 const app = express();
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.static("public"));
 
 app.use(compression());
@@ -22,6 +26,15 @@ app.use(cookieParser());
 
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
+
+app.use((req, res, next) => {
+  res.cookie("mycookie", "value", {
+    sameSite: "none",
+    secure: true,
+    httpOnly: true,
+  });
+  next();
+});
 
 const server = http.createServer(app);
 const port = 3004;
