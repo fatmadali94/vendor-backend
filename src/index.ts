@@ -12,15 +12,17 @@ import crypto from "crypto";
 
 import router from "./router";
 dotenv.config();
-const corsOptions = {
-  origin: true, // allow requests from any domain
-  credentials: true, // allow cookies to be sent with requests
-};
 
 const app = express();
-app.use(cors(corsOptions));
-app.use(express.static("public"));
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", req.headers.origin);
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type");
+  next();
+});
 
+app.use(express.static("public"));
 app.use(compression());
 app.use(cookieParser());
 
