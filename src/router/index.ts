@@ -1,6 +1,4 @@
 import express from "express";
-
-import users from "./users";
 import auth from "./auth";
 import materialGrades from "./materials/materialGrades";
 import materialGroups from "./materials/materialGroups";
@@ -14,10 +12,10 @@ import getAll from "./getAll";
 import exhibition from "./exhibition";
 import messages from "./messages";
 import offer from "./offer";
+import products from "./products";
 const router = express.Router();
 
 export default (): express.Router => {
-  users(router);
   auth(router);
   materialGrades(router);
   materialGroups(router);
@@ -31,6 +29,7 @@ export default (): express.Router => {
   exhibition(router);
   messages(router);
   offer(router);
+  products(router);
 
   return router;
 };

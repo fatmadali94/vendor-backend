@@ -1,15 +1,13 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
 import bcrypt from "bcryptjs";
 
-interface IUser extends Document {
+interface IUnverifiedUser extends Document {
   name: string;
   family_name: string;
   id_number: string;
   email: string;
   username: string;
   password: string;
-  resetPasswordToken: string;
-  resetPasswordExpires: Number;
   address: string;
   cellphone: string;
   phone: string;
@@ -22,10 +20,11 @@ interface IUser extends Document {
     | "provider"
     | "other";
   role: "admin" | "provider" | "user";
+  verificationCode: string;
   matchPassword(enteredPassword: string): Promise<boolean>;
 }
 
-const userSchema = new Schema<IUser>(
+const unverifiedUserSchema = new Schema<IUnverifiedUser>(
   {
     name: {
       type: String,
@@ -55,8 +54,6 @@ const userSchema = new Schema<IUser>(
       type: String,
       required: true,
     },
-    resetPasswordToken: { type: String, required: false },
-    resetPasswordExpires: { type: Number, required: false },
     id_number: {
       type: String,
       required: true,
@@ -84,11 +81,15 @@ const userSchema = new Schema<IUser>(
       enum: ["admin", "provider", "user"],
       default: "user",
     },
+    verificationCode: {
+      type: String,
+      required: true,
+    },
   },
   { timestamps: true }
 );
 
-userSchema.pre("save", async function (next) {
+unverifiedUserSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
     return next();
   }
@@ -97,10 +98,15 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-userSchema.methods.matchPassword = async function (enteredPassword: string) {
+unverifiedUserSchema.methods.matchPassword = async function (
+  enteredPassword: string
+) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-const User = mongoose.model<IUser>("User", userSchema);
+const UnverifiedUser = mongoose.model<IUnverifiedUser>(
+  "UnverifiedUser",
+  unverifiedUserSchema
+);
 
-export default User;
+export default UnverifiedUser;
