@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import User from "../db/users";
+import Provider from "../db/providers";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -14,6 +15,9 @@ const protect = async (req: any, res: any, next: any) => {
       token = req.headers.authorization.split(" ")[1];
       const decoded: any = jwt.verify(token, process.env.JWT_SECRET);
       req.user = await User.findById(decoded.id).select("-password");
+      if (!req.user) {
+        req.user = await Provider.findById(decoded.id).select("-password");
+      }
       next();
     } catch (error) {
       res.status(401).json({ message: "Not authorized, token failed" });

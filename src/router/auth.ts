@@ -2,13 +2,13 @@ import express from "express";
 import {
   registerUser,
   loginUser,
-  getMe,
   registerProvider,
   loginProvider,
   verifyUser,
-  resendVerificationCode,
   resendProviderVerificationCode,
   verifyProvider,
+  resendUserVerificationCode,
+  getMe,
 } from "../controllers/auth";
 import { protect, authorize } from "../middlewares/authMiddleware";
 
@@ -16,7 +16,7 @@ export default (router: express.Router) => [
   // Route to register a new user
   router.post("/user-register", registerUser),
   router.post("/verify-user", verifyUser),
-  router.post("/resend-verify-user", resendVerificationCode),
+  router.post("/resend-verify-user", resendUserVerificationCode),
   router.post("/user-login", loginUser),
 
   // PROVIDERS ROUTES

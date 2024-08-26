@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import User from "../db/users";
 import Provider from "../db/providers";
 import crypto from "crypto";
+import bcrypt from "bcrypt";
 import UnverifiedUser from "../db/unverifiedUsers";
 import {
   sendPasswordResetEmail,
@@ -14,19 +15,16 @@ import UnverifiedProvider from "../db/unverifiedProviders";
 
 dotenv.config();
 
-const hashPassword = (password: string) => {
-  return crypto
-    .pbkdf2Sync(password, process.env.PASS_SEC, 1000, 64, `sha512`)
-    .toString(`hex`);
+const hashPassword = async (password: string) => {
+  const saltRounds = 10; // You can increase this number to make it more secure
+  const hashedPassword = await bcrypt.hash(password, saltRounds);
+  return hashedPassword;
 };
 
-const validatePassword = (password: string, hashedPassword: string) => {
-  const hash = crypto
-    .pbkdf2Sync(password, process.env.PASS_SEC, 1000, 64, `sha512`)
-    .toString(`hex`);
-  return hash === hashedPassword;
+const validatePassword = async (password: string, hashedPassword: string) => {
+  const isMatch = await bcrypt.compare(password, hashedPassword);
+  return isMatch;
 };
-
 const generateToken = (id: any) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: "3d",
@@ -39,7 +37,7 @@ export const registerUser = async (req: any, res: any) => {
   const data = req.body;
   try {
     const verificationCode = crypto.randomBytes(3).toString("hex");
-    const hashedPassword = hashPassword(data.password);
+    const hashedPassword = await hashPassword(data.password);
     const unverifiedUser = new UnverifiedUser({
       ...data,
       password: hashedPassword,
@@ -74,7 +72,7 @@ export const verifyUser = async (req: any, res: any) => {
   }
 };
 
-export const resendVerificationCode = async (req: any, res: any) => {
+export const resendUserVerificationCode = async (req: any, res: any) => {
   const { email } = req.body;
   try {
     const unverifiedUser = await UnverifiedUser.findOne({ email });
@@ -99,7 +97,6 @@ export const loginUser = async (req: any, res: any) => {
 
   try {
     const user = await User.findOne({ email });
-    console.log(user, "USER");
     if (!user || !validatePassword(password, user.password)) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
@@ -144,7 +141,7 @@ export const userResetPassword = async (req: any, res: any) => {
   const { token, newPassword } = req.body;
 
   try {
-    const user = await User.findOne({
+    const user: any = await User.findOne({
       resetPasswordToken: token,
       resetPasswordExpires: { $gt: Date.now() },
     });
@@ -170,7 +167,7 @@ export const registerProvider = async (req: any, res: any) => {
   const data = req.body;
   try {
     const verificationCode = crypto.randomBytes(3).toString("hex");
-    const hashedPassword = hashPassword(data.password);
+    const hashedPassword = await hashPassword(data.password);
     const unverifiedProvider = new UnverifiedProvider({
       ...data,
       password: hashedPassword,
@@ -276,7 +273,7 @@ export const providerResetPassword = async (req: any, res: any) => {
   const { token, newPassword } = req.body;
 
   try {
-    const provider = await Provider.findOne({
+    const provider: any = await Provider.findOne({
       resetPasswordToken: token,
       resetPasswordExpires: { $gt: Date.now() },
     });
@@ -298,7 +295,10 @@ export const providerResetPassword = async (req: any, res: any) => {
 
 export const getMe = async (req: any, res: any) => {
   try {
-    const user = await User.findById(req.user._id).select("-password");
+    let user = await User.findById(req.user._id).select("-password");
+    if (!user) {
+      user = await Provider.findById(req.user._id).select("-password");
+    }
     res.json(user);
   } catch (error) {
     res.status(500).json({ message: error.message });
