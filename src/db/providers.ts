@@ -1,5 +1,27 @@
-import mongoose, { Document, Model, Schema } from "mongoose";
+import mongoose, { Document, Model, Schema, ObjectId } from "mongoose";
+import MessageSchema from "./messages";
+import reviewSchema from "./reviews";
 import bcrypt from "bcrypt";
+
+interface MaterialRecord {
+  materialgroup?: ObjectId;
+  materialname?: ObjectId;
+  materialgrade?: ObjectId;
+}
+
+interface PartRecord {
+  partgroup?: ObjectId;
+  partname?: ObjectId;
+  partgeneralid?: ObjectId;
+}
+
+// Define the schema for reviews
+interface Review {
+  reviewer: ObjectId;
+  rating: number; // Rating out of 5, for example
+  comment?: string; // Optional comment field
+  timestamp: Date;
+}
 
 interface IUser extends Document {
   company_name: string;
@@ -23,7 +45,11 @@ interface IUser extends Document {
   resetPasswordToken: string;
   resetPasswordExpires: Number;
   username: string;
+  records: (MaterialRecord | PartRecord)[];
   role: "admin" | "provider" | "user";
+  messages: mongoose.Schema.Types.ObjectId[] | (typeof MessageSchema)[]; // Updated to include messageSchema
+  reviews: Review[];
+  isVerified: boolean;
   matchPassword(enteredPassword: string): Promise<boolean>;
 }
 
@@ -90,7 +116,6 @@ const providerSchema = new Schema<IUser>({
     required: false,
     unique: true,
   },
-
   address: {
     type: String,
     required: true,
@@ -111,6 +136,46 @@ const providerSchema = new Schema<IUser>({
     type: String,
     required: true,
   },
+
+  records: [
+    {
+      materialgroup: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "MaterialGroups",
+        required: false,
+      },
+      materialname: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "MaterialNames",
+        required: false,
+      },
+      materialgrade: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "MaterialGrades",
+        required: false,
+      },
+    },
+    {
+      partgroup: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "PartGroups",
+        required: false,
+      },
+      partname: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "PartNames",
+        required: false,
+      },
+      partgeneralid: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "PartGeneralIds",
+        required: false,
+      },
+    },
+  ],
+  messages: [MessageSchema], // Correct usage of messageSchema here
+  reviews: [reviewSchema], // Array of reviews
+  isVerified: { type: Boolean, default: false }, // Boolean f
   role: {
     type: String,
     enum: ["admin", "provider", "user"],
@@ -133,6 +198,6 @@ providerSchema.methods.matchPassword = async function (
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-const User = mongoose.model<IUser>("Provider", providerSchema);
+const Provider = mongoose.model<IUser>("Provider", providerSchema);
 
-export default User;
+export default Provider;

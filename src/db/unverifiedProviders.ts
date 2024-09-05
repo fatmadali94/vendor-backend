@@ -1,5 +1,17 @@
-import mongoose, { Document, Model, Schema } from "mongoose";
+import mongoose, { Document, Model, Schema, ObjectId } from "mongoose";
 import bcrypt from "bcrypt";
+
+interface MaterialRecord {
+  materialgroup?: ObjectId;
+  materialname?: ObjectId;
+  materialgrade?: ObjectId;
+}
+
+interface PartRecord {
+  partgroup?: ObjectId;
+  partname?: ObjectId;
+  partgeneralid?: ObjectId;
+}
 
 interface IUnverifiedProvider extends Document {
   company_name: string;
@@ -21,6 +33,7 @@ interface IUnverifiedProvider extends Document {
   address: string;
   password: string;
   username: string;
+  records: (MaterialRecord | PartRecord)[];
   role: "admin" | "provider";
   verificationCode: string;
   matchPassword(enteredPassword: string): Promise<boolean>;
@@ -112,6 +125,42 @@ const unverifiedProviderSchema = new Schema<IUnverifiedProvider>({
     type: String,
     required: true,
   },
+  records: [
+    {
+      materialgroup: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "MaterialGroups",
+        required: false,
+      },
+      materialname: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "MaterialNames",
+        required: false,
+      },
+      materialgrade: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "MaterialGrades",
+        required: false,
+      },
+    },
+    {
+      partgroup: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "PartGroups",
+        required: false,
+      },
+      partname: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "PartNames",
+        required: false,
+      },
+      partgeneralid: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "PartGeneralIds",
+        required: false,
+      },
+    },
+  ],
   role: {
     type: String,
     enum: ["admin", "provider", "user"],

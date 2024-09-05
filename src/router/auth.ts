@@ -2,14 +2,18 @@ import express from "express";
 import {
   registerUser,
   loginUser,
-  registerProvider,
-  loginProvider,
+  resendUserVerificationCode,
   verifyUser,
+  updateUser,
+} from "../controllers/users";
+import {
   resendProviderVerificationCode,
   verifyProvider,
-  resendUserVerificationCode,
-  getMe,
-} from "../controllers/auth";
+  registerProvider,
+  loginProvider,
+  updateProvider,
+} from "../controllers/providers";
+import { getMe } from "../controllers/auth";
 import { protect, authorize } from "../middlewares/authMiddleware";
 
 export default (router: express.Router) => [
@@ -18,12 +22,14 @@ export default (router: express.Router) => [
   router.post("/verify-user", verifyUser),
   router.post("/resend-verify-user", resendUserVerificationCode),
   router.post("/user-login", loginUser),
+  router.patch("/user-update", updateUser),
 
   // PROVIDERS ROUTES
   router.post("/provider-register", registerProvider),
   router.post("/verify-provider", verifyProvider),
   router.post("/resend-verify-provider", resendProviderVerificationCode),
   router.post("/provider-login", loginProvider),
+  router.patch("/provider-update", updateProvider),
 
   // Route to login a user
 

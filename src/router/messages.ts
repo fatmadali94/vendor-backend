@@ -1,7 +1,15 @@
 import express from "express";
-import { getMessages, createMessage } from "../controllers/messages/messages";
+import { protect } from "../middlewares/authMiddleware";
+import {
+  getSentMessages,
+  getReceivedMessages,
+  respondToMessage,
+  sendMessage,
+} from "../controllers/messages";
 
 export default (router: express.Router) => [
-  router.get("/messages", getMessages),
-  router.post("/createMessage", createMessage),
+  router.get("/sent-messages", protect, getSentMessages),
+  router.get("/received-messages", protect, getReceivedMessages),
+  router.post("/:id/respond-message", protect, respondToMessage),
+  router.post("/message", protect, sendMessage),
 ];
