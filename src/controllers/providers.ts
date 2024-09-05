@@ -195,3 +195,12 @@ export const updateProvider = async (req: any, res: any) => {
       .json({ message: "An error occurred while updating the user." });
   }
 };
+
+export const getAllProviders = async (req: any, res: any) => {
+  try {
+    const providers = await Provider.find();
+    res.status(200).json(providers);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to retrieve providers", error });
+  }
+};

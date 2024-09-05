@@ -1,22 +1,24 @@
 import { MessageModel } from "../db/messages";
 
 export const sendMessage = async (req: any, res: any) => {
-  const { content, recipient } = req.body;
+  const { content, subject, recipient, sender } = req.body;
+  console.log(content, subject, recipient, sender);
 
-  if (!content || !recipient) {
+  if (!content || !recipient || !subject || !sender) {
     return res
       .status(400)
-      .json({ message: "Content and recipient are required." });
+      .json({ message: "Content, Subject and recipient are required." });
   }
 
   try {
     const message = new MessageModel({
-      sender: req.user._id, // Assume req.user._id is user1's ID from the authentication middleware
+      sender,
       recipient,
       content,
+      subject,
     });
-
     await message.save();
+    console.log("message", message);
     res
       .status(201)
       .json({ successMessage: "Response sent successfully", message });

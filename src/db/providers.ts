@@ -199,5 +199,6 @@ providerSchema.methods.matchPassword = async function (
 };
 
 const Provider = mongoose.model<IUser>("Provider", providerSchema);
+export const getVerifiedProviders = () => Provider.find();
 
 export default Provider;

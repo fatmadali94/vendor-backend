@@ -11,6 +11,7 @@ import { getPartGroups } from "../db/parts/partGroups";
 import { getPartGeneralIds } from "../db/parts/partGeneralIds";
 import { getPartNames } from "../db/parts/partNames";
 import { getProducts } from "../db/products";
+import { getVerifiedProviders } from "../db/providers";
 
 // export const getAllParts = () =>
 //   partGroupModel.find().populate({
@@ -58,13 +59,14 @@ export const getAll = async (req: express.Request, res: express.Response) => {
   try {
     const materialGroups = await getMaterialGroups();
     const materialNames = await getMaterialNames();
-    const materialGrades = await getMaterialGrades();
+    const materialGrades: any = await getMaterialGrades();
     const partGroups = await getPartGroups();
     const partNames = await getPartNames();
     const partGeneralIds = await getPartGeneralIds();
     const materialProviders = await getMaterialProviders();
     const partProviders = await getAllPartProviders();
     const products = await getProducts();
+    const verifiedProviders = await getVerifiedProviders();
 
     const allArray = {
       materialProviders,
@@ -76,6 +78,7 @@ export const getAll = async (req: express.Request, res: express.Response) => {
       partNames,
       partGeneralIds,
       products,
+      verifiedProviders,
     };
     return res.status(200).json(allArray);
   } catch (error) {
