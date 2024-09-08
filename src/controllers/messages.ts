@@ -18,7 +18,6 @@ export const sendMessage = async (req: any, res: any) => {
       subject,
     });
     await message.save();
-    console.log("message", message);
     res
       .status(201)
       .json({ successMessage: "Response sent successfully", message });

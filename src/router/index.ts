@@ -13,6 +13,8 @@ import exhibition from "./exhibition";
 import messages from "./messages";
 import offer from "./offer";
 import products from "./products";
+import resourceCenter from "./resourceCenter";
+import marketInformation from "./marketInformation";
 const router = express.Router();
 
 export default (): express.Router => {
@@ -30,6 +32,8 @@ export default (): express.Router => {
   messages(router);
   offer(router);
   products(router);
+  resourceCenter(router);
+  marketInformation(router);
 
   return router;
 };

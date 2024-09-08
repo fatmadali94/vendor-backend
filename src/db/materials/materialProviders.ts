@@ -62,6 +62,7 @@ export const MaterialProviderModel = mongoose.model(
   "MaterialProviders",
   MaterialProviderSchema
 );
+
 export const getMaterialProviders = () => {
   const materialProviders = MaterialProviderModel.find()
     .populate({
@@ -80,6 +81,7 @@ export const getMaterialProviders = () => {
 
   return materialProviders;
 };
+
 export const getMaterialProviderById = (id: any) =>
   MaterialProviderModel.findById(id)
     .populate({
