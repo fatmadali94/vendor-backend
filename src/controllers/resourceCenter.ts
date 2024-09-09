@@ -72,7 +72,7 @@ export const getResource = async (
 ) => {
   try {
     const { id } = req.params;
-    const resource = await deleteResourceById(id);
+    const resource = await getResourceById(id);
     return res.status(200).json(resource);
   } catch (error) {
     console.log(error);
