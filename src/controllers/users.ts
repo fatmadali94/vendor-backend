@@ -17,19 +17,36 @@ import {
   generateToken,
   validatePassword,
 } from "../utils/helpers";
+const cloudinary = require("../utils/cloudinary");
 
 dotenv.config();
 
 export const registerUser = async (req: any, res: any) => {
   const data = req.body;
+  console.log("data", data);
   try {
     const verificationCode = crypto.randomBytes(3).toString("hex");
     const hashedPassword = await hashPassword(data.password);
-    const unverifiedUser = new UnverifiedUser({
+
+    let newUserData = {
       ...data,
       password: hashedPassword,
       verificationCode,
-    });
+    };
+    if (req.body.image) {
+      const result = await cloudinary.uploader.upload(req.body.image, {
+        folder: "verifiedUsers", // Upload to the "users" folder in Cloudinary
+      });
+      newUserData = {
+        ...newUserData,
+        image: {
+          public_id: result.public_id,
+          url: result.secure_url,
+        },
+      };
+    }
+
+    const unverifiedUser = new UnverifiedUser(newUserData);
     await unverifiedUser.save();
     await sendVerificationEmail(unverifiedUser.email, verificationCode);
     res.status(201).json({ message: "Verification email sent" });
@@ -48,7 +65,8 @@ export const verifyUser = async (req: any, res: any) => {
     if (!unverifiedUser) {
       return res.status(400).json({ message: "Invalid verification code" });
     }
-    const user = new User(unverifiedUser.toObject());
+    const { verificationCode, ...userData } = unverifiedUser.toObject();
+    const user = new User(userData);
     await user.save();
     await UnverifiedUser.deleteOne({ email: unverifiedUser.email });
     await sendWelcomeEmail(user.email);

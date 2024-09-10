@@ -21,11 +21,25 @@ interface IUnverifiedUser extends Document {
     | "other";
   role: "admin" | "provider" | "user";
   verificationCode: string;
+  image: {
+    public_id?: string;
+    url?: string;
+  };
   matchPassword(enteredPassword: string): Promise<boolean>;
 }
 
 const unverifiedUserSchema = new Schema<IUnverifiedUser>(
   {
+    image: {
+      public_id: {
+        type: String,
+        required: false,
+      },
+      url: {
+        type: String,
+        required: false,
+      },
+    },
     name: {
       type: String,
       required: true,

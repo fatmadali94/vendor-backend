@@ -6,6 +6,7 @@ import {
   getMaterialProviders,
   MaterialProviderModel,
 } from "../../db/materials/materialProviders";
+import { getVerifiedProviders } from "../../db/providers";
 
 const cloudinary = require("../../utils/cloudinary");
 
@@ -15,7 +16,10 @@ export const getAllProviders = async (
 ) => {
   try {
     const providers = await getMaterialProviders();
-    return res.status(200).json(providers);
+    const verifiedProviders = await getVerifiedProviders();
+    const allProviders = [...providers, ...verifiedProviders];
+
+    return res.status(200).json(allProviders);
   } catch (error) {
     console.log(error);
     return res.sendStatus(400);

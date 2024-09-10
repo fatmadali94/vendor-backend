@@ -22,11 +22,25 @@ interface IUser extends Document {
     | "provider"
     | "other";
   role: "admin" | "provider" | "user";
+  image: {
+    public_id?: string;
+    url?: string;
+  };
   matchPassword(enteredPassword: string): Promise<boolean>;
 }
 
 const userSchema = new Schema<IUser>(
   {
+    image: {
+      public_id: {
+        type: String,
+        required: false,
+      },
+      url: {
+        type: String,
+        required: false,
+      },
+    },
     name: {
       type: String,
       required: true,

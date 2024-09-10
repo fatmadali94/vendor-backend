@@ -2,7 +2,7 @@ import express from "express";
 import * as jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import User from "../db/users";
-import Provider from "../db/providers";
+import Provider, { getVerifiedProviderById } from "../db/providers";
 import crypto from "crypto";
 import {
   sendPasswordResetEmail,
@@ -16,6 +16,7 @@ import {
   validatePassword,
 } from "../utils/helpers";
 dotenv.config();
+const cloudinary = require("../utils/cloudinary");
 
 export const registerProvider = async (req: any, res: any) => {
   const data = req.body;
@@ -38,12 +39,29 @@ export const registerProvider = async (req: any, res: any) => {
     });
     const verificationCode = crypto.randomBytes(3).toString("hex");
     const hashedPassword = await hashPassword(data.password);
-    const unverifiedProvider = new UnverifiedProvider({
-      ...data,
-      records: processedRecords,
-      password: hashedPassword,
-      verificationCode,
-    });
+    let unverifiedProvider;
+    if (req.body.image) {
+      const result = await cloudinary.uploader.upload(req.body.image, {
+        folder: "verifiedProviders",
+      });
+      unverifiedProvider = new UnverifiedProvider({
+        ...data,
+        records: processedRecords,
+        password: hashedPassword,
+        verificationCode,
+        image: {
+          public_id: result.public_id,
+          url: result.secure_url,
+        },
+      });
+    } else {
+      unverifiedProvider = new UnverifiedProvider({
+        ...data,
+        records: processedRecords,
+        password: hashedPassword,
+        verificationCode,
+      });
+    }
     await unverifiedProvider.save();
     await sendVerificationEmail(unverifiedProvider.email, verificationCode);
     res.status(201).json({ message: "Verification email sent" });
@@ -62,14 +80,15 @@ export const verifyProvider = async (req: any, res: any) => {
     if (!unverifiedProvider) {
       return res.status(400).json({ message: "Invalid verification code" });
     }
-    const provider = new Provider(unverifiedProvider.toObject());
+    const { verificationCode, ...providerData } = unverifiedProvider.toObject();
+
+    const provider = new Provider(providerData);
     await provider.save();
 
     // Remove the unverified provider from the UnverifiedUser collection
     await UnverifiedProvider.deleteOne({ email: unverifiedProvider.email });
-
-    const token = generateToken(provider._id);
     await sendWelcomeEmail(provider.email);
+    const token = generateToken(provider._id);
     res.status(200).json({ token, provider });
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -196,11 +215,24 @@ export const updateProvider = async (req: any, res: any) => {
   }
 };
 
-export const getAllProviders = async (req: any, res: any) => {
+// export const getAllVerifiedProviders = async (req: any, res: any) => {
+//   try {
+//     const providers = await Provider.find();
+//     res.status(200).json(providers);
+//   } catch (error) {
+//     res.status(500).json({ message: "Failed to retrieve providers", error });
+//   }
+// };
+
+export const getVerifiedProvider = async (
+  req: express.Request,
+  res: express.Response
+) => {
   try {
-    const providers = await Provider.find();
-    res.status(200).json(providers);
+    const { id } = req.params;
+    const provider = await getVerifiedProviderById(id);
+    return res.status(200).json(provider);
   } catch (error) {
-    res.status(500).json({ message: "Failed to retrieve providers", error });
+    res.sendStatus(400);
   }
 };

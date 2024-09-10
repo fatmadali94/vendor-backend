@@ -12,7 +12,7 @@ import {
   registerProvider,
   loginProvider,
   updateProvider,
-  getAllProviders,
+  getVerifiedProvider,
 } from "../controllers/providers";
 import { getMe } from "../controllers/auth";
 import { protect, authorize } from "../middlewares/authMiddleware";
@@ -31,7 +31,9 @@ export default (router: express.Router) => [
   router.post("/resend-verify-provider", resendProviderVerificationCode),
   router.post("/provider-login", loginProvider),
   router.patch("/provider-update", updateProvider),
-  router.get("/verified-providers", getAllProviders),
+  router.get("/verifiedProvider/:id", getVerifiedProvider),
+
+  // router.get("/verified-providers", getAllVerifiedProviders),
 
   // Route to login a user
 

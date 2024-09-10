@@ -36,10 +36,24 @@ interface IUnverifiedProvider extends Document {
   records: (MaterialRecord | PartRecord)[];
   role: "admin" | "provider";
   verificationCode: string;
+  image: {
+    public_id?: string;
+    url?: string;
+  };
   matchPassword(enteredPassword: string): Promise<boolean>;
 }
 
 const unverifiedProviderSchema = new Schema<IUnverifiedProvider>({
+  image: {
+    public_id: {
+      type: String,
+      required: false,
+    },
+    url: {
+      type: String,
+      required: false,
+    },
+  },
   company_name: {
     type: String,
     required: true,

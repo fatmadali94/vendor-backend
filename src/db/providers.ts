@@ -50,10 +50,24 @@ interface IUser extends Document {
   messages: mongoose.Schema.Types.ObjectId[] | (typeof MessageSchema)[]; // Updated to include messageSchema
   reviews: Review[];
   isVerified: boolean;
+  image: {
+    public_id?: string;
+    url?: string;
+  };
   matchPassword(enteredPassword: string): Promise<boolean>;
 }
 
 const providerSchema = new Schema<IUser>({
+  image: {
+    public_id: {
+      type: String,
+      required: false,
+    },
+    url: {
+      type: String,
+      required: false,
+    },
+  },
   company_name: {
     type: String,
     required: true,
@@ -199,6 +213,39 @@ providerSchema.methods.matchPassword = async function (
 };
 
 const Provider = mongoose.model<IUser>("Provider", providerSchema);
-export const getVerifiedProviders = () => Provider.find();
+
+export const getVerifiedProviders = () => {
+  const verifiedProviders = Provider.find()
+    .populate({
+      path: "records.materialgroup",
+      model: "MaterialGroups", // Ensures that Mongoose knows which model to use for population
+    })
+    .populate({
+      path: "records.materialname",
+      model: "MaterialNames", // Similarly, define the model for material names
+    })
+    .populate({
+      path: "records.materialgrade",
+      model: "MaterialGrades", // And for material grades
+    })
+    .exec();
+
+  return verifiedProviders;
+};
+export const getVerifiedProviderById = (id: any) =>
+  Provider.findById(id)
+    .populate({
+      path: "records.materialgroup",
+      model: "MaterialGroups", // Ensures that Mongoose knows which model to use for population
+    })
+    .populate({
+      path: "records.materialname",
+      model: "MaterialNames", // Similarly, define the model for material names
+    })
+    .populate({
+      path: "records.materialgrade",
+      model: "MaterialGrades", // And for material grades
+    })
+    .exec();
 
 export default Provider;
