@@ -3,7 +3,7 @@ import http from "http";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import compression from "compression";
-import cors from "cors";
+import cors, { CorsOptions } from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import crypto from "crypto";
@@ -22,25 +22,29 @@ app.use(cookieParser());
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 
-const corsOptions = {
-  origin: function (origin: any, callback: any) {
+const corsOptions: CorsOptions = {
+  origin: function (
+    origin: string | undefined,
+    callback: (err: Error | null, allow?: boolean) => void
+  ) {
     const allowedOrigins = [
       "https://demo-1.chiliscript.de", // Your live frontend
-      "http://localhost:3000", // Your local development frontend
+      "http://localhost:3000", // Your local frontend
     ];
-    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-      // If the origin is in the allowed list or it's a server-to-server request (no origin)
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
       callback(new Error("Not allowed by CORS"));
     }
   },
-  credentials: true, // Allow cookies and credentials
-  allowedHeaders: ["Content-Type", "Authorization"], // Allow Authorization header
+  credentials: true, // Ensure cookies and credentials are allowed
+  allowedHeaders: ["Content-Type", "Authorization"], // Allow necessary headers
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"], // Allow necessary HTTP methods
 };
 
 app.use(cors(corsOptions));
+
+// Handle preflight (OPTIONS) requests explicitly
 app.options("*", cors(corsOptions));
 
 app.use((req, res, next) => {
