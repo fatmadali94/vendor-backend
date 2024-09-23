@@ -9,7 +9,7 @@ import {
 } from "../../db/materials/materialGrades";
 import { materialGradeModel } from "../../db/materials/materialGrades";
 
-const cloudinary = require("../../utils/cloudinary");
+import cloudinary from "../../utils/cloudinary";
 
 export const getAllMaterialGrades = async (
   req: express.Request,

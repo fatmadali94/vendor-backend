@@ -3,7 +3,7 @@ var mongoose = require("mongoose");
 import { getProducts, deleteProductById, getProductById } from "../db/products";
 import { productModel } from "../db/products";
 
-const cloudinary = require("../utils/cloudinary");
+import cloudinary from "../utils/cloudinary";
 
 export const getAllProducts = async (
   req: express.Request,

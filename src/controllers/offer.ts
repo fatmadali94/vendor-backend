@@ -3,7 +3,7 @@ import { getOffers, OfferModel } from "../db/offer";
 import nodemailer from "nodemailer";
 
 var mongoose = require("mongoose");
-const cloudinary = require("../utils/cloudinary");
+import cloudinary from "../utils/cloudinary";
 
 export const getAllOffers = async (
   req: express.Request,

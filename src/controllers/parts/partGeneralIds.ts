@@ -6,7 +6,7 @@ import {
 } from "../../db/parts/partGeneralIds";
 import { partGeneralIdModel } from "../../db/parts/partGeneralIds";
 
-const cloudinary = require("../../utils/cloudinary");
+import cloudinary from "../../utils/cloudinary";
 
 export const getAllPartGeneralIds = async (
   req: express.Request,

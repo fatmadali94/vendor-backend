@@ -16,7 +16,7 @@ import {
   validatePassword,
 } from "../utils/helpers";
 dotenv.config();
-const cloudinary = require("../utils/cloudinary");
+import cloudinary from "../utils/cloudinary";
 
 export const registerProvider = async (req: any, res: any) => {
   const data = req.body;

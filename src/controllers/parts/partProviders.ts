@@ -8,7 +8,7 @@ import {
 } from "../../db/parts/partProviders";
 import { getVerifiedProviders } from "../../db/providers";
 
-const cloudinary = require("../../utils/cloudinary");
+import cloudinary from "../../utils/cloudinary";
 
 export const getAllPartProviders = async (
   req: express.Request,

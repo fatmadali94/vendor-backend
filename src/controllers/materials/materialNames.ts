@@ -9,7 +9,7 @@ import {
 } from "../../db/materials/materialNames";
 import { materialNameModel } from "../../db/materials/materialNames";
 
-const cloudinary = require("../../utils/cloudinary");
+import cloudinary from "../../utils/cloudinary";
 
 export const getAllMaterialNames = async (
   req: express.Request,

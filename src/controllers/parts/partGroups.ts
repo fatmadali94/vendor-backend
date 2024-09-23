@@ -4,7 +4,7 @@ import {
   getPartGroups,
   partGroupModel,
 } from "../../db/parts/partGroups";
-const cloudinary = require("../../utils/cloudinary");
+import cloudinary from "../../utils/cloudinary";
 
 interface MulterRequest extends express.Request {
   file: any;

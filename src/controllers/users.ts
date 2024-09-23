@@ -17,7 +17,7 @@ import {
   generateToken,
   validatePassword,
 } from "../utils/helpers";
-const cloudinary = require("../utils/cloudinary");
+import cloudinary from "../utils/cloudinary";
 
 dotenv.config();
 

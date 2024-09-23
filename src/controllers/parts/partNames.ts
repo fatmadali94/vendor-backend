@@ -4,7 +4,7 @@ var mongoose = require("mongoose");
 import { getPartNames, deletePartNameById } from "../../db/parts/partNames";
 import { partNameModel } from "../../db/parts/partNames";
 
-const cloudinary = require("../../utils/cloudinary");
+import cloudinary from "../../utils/cloudinary";
 
 export const getAllPartNames = async (
   req: express.Request,

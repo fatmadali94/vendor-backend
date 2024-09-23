@@ -9,7 +9,7 @@ import {
   deleteExhibitionById,
 } from "../../db/exhibition";
 
-const cloudinary = require("../../utils/cloudinary");
+import cloudinary from "../../utils/cloudinary";
 
 export const getAllExhibitions = async (
   req: express.Request,

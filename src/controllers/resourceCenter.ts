@@ -2,7 +2,7 @@ import express from "express";
 var mongoose = require("mongoose");
 import { ResourceCenterModel } from "../db/resourceCenter";
 
-const cloudinary = require("../utils/cloudinary");
+import cloudinary from "../utils/cloudinary";
 
 export const getResources = () => ResourceCenterModel.find();
 export const getResourceById = (id: string) => ResourceCenterModel.findById(id);

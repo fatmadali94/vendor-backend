@@ -1,7 +1,7 @@
 import express from "express";
 var mongoose = require("mongoose");
 import { MarketInfoModel } from "../db/marketInformation";
-const cloudinary = require("../utils/cloudinary");
+import cloudinary from "../utils/cloudinary";
 
 export const getAllMarketInformations = () => MarketInfoModel.find();
 export const getMarketInfoById = (id: string) => MarketInfoModel.findById(id);

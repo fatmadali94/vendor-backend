@@ -6,7 +6,7 @@ import {
   // updateMaterialGroupById,
   materialGroupModel,
 } from "../../db/materials/materialGroups";
-const cloudinary = require("../../utils/cloudinary");
+import cloudinary from "../../utils/cloudinary";
 
 interface MulterRequest extends express.Request {
   file: any;

@@ -8,7 +8,7 @@ import {
 } from "../../db/materials/materialProviders";
 import { getVerifiedProviders } from "../../db/providers";
 
-const cloudinary = require("../../utils/cloudinary");
+import cloudinary from "../../utils/cloudinary";
 
 export const getAllProviders = async (
   req: express.Request,

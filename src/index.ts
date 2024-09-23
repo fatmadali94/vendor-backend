@@ -54,7 +54,7 @@ app.use((req, res, next) => {
 const server = http.createServer(app);
 const port = 3004;
 server.listen(port, () => {
-  console.log("server running on http://localhost:3003/");
+  console.log("server running on http://localhost:3004/");
   console.log("working great");
 });
 
