@@ -1,0 +1,64 @@
+# File: .github/workflows/deploy.yml
+name: CI/CD Pipeline for Node.js
+
+on:
+  push:
+    branches:
+      - main # Deploy on push to the main branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Step 2: Set up Node.js environment
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Step 4: Run tests
+      - name: Run tests
+        run: npm test
+
+      # Step 5: Build the Docker image and push to Docker Hub
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t my-node-app:${{ github.sha }} .
+          docker tag my-node-app:${{ github.sha }} kasramahsouli/my-node-app:latest
+          docker push kasramahsouli/my-node-app:latest
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 6: Checkout the code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Step 7: Install sshpass to handle password-based SSH authentication
+      - name: Install sshpass
+        run: sudo apt-get install sshpass
+
+      # Step 8: Deploy the app via SSH using password authentication
+      - name: SSH to VPS and Deploy using password
+        run: |
+          sshpass -p "${{ secrets.VPS_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }} << EOF
+            docker pull kasramahsouli/my-node-app:latest
+            docker stop my-node-app || true
+            docker rm my-node-app || true
+            docker run -d -p 3000:3000 --name my-node-app kasramahsouli/my-node-app:latest
+            pm2 reload my-node-app
+          EOF
