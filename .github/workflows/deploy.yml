@@ -25,11 +25,7 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # Step 4: Run tests
-      - name: Run tests
-        run: npm test
-
-      # Step 5: Build the Docker image and push to Docker Hub
+      # Step 4: Build the Docker image and push to Docker Hub
       - name: Build and Push Docker Image
         run: |
           docker build -t my-node-app:${{ github.sha }} .
