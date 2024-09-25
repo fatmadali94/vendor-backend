@@ -16,10 +16,14 @@ dotenv.config();
 
 const app = express();
 
-const corsOptions = {
-  origin: "*",
-};
-app.use(cors(corsOptions));
+app.use(
+  cors({
+    origin: "*", // Specify the origin
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 app.use(express.static("public"));
 app.use(cookieParser());
