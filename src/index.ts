@@ -25,9 +25,9 @@ app.use(helmet());
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://demo-1.chiliscript.de/"], // Your React app's local address
+    origin: ["http://localhost:5173", "https://demo-1.chiliscript.de"], // Your React app's local address
     credentials: true,
-    methods: ["GET", "POST", "OPTIONS"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
