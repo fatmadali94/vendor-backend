@@ -6,7 +6,7 @@ import compression from "compression";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import crypto from "crypto";
-import helmet from "helmet";
+// import helmet from "helmet";
 import cors from "cors";
 
 // import dotenv from "dotenv";
@@ -21,17 +21,19 @@ app.use(cookieParser());
 
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
-app.use(helmet());
+// app.use(helmet());
+app.use(compression());
 
 app.use(
   cors({
-    origin: [
-      "https://demo-1.chiliscript.de",
-      "http://localhost:5173",
-      "https://localhost:5173",
-      "localhost:5173",
-    ], // Your React app's local address
-    credentials: true,
+    // origin: [
+    //   "https://demo-1.chiliscript.de",
+    //   "http://localhost:5173",
+    //   "https://localhost:5173",
+    //   "localhost:5173",
+    // ],
+    origin: "*",
+    // credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
@@ -71,4 +73,4 @@ mongoose.connect(process.env.MONGO_URL! as string, {
 });
 mongoose.connection.on("error", (error: Error) => console.log(error));
 
-app.use("/server", compression(), router());
+app.use("/server", router());
