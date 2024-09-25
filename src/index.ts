@@ -23,14 +23,22 @@ app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 app.use(helmet());
 
-app.use(
+//localhost:5173
+
+http: app.use(
   cors({
-    origin: "*", // Your React app's local address
+    origin: [
+      "https://demo-1.chiliscript.de",
+      "http://localhost:5173",
+      "https://localhost:5173",
+      "localhost:5173",
+    ], // Your React app's local address
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+app.options("*", cors()); // Handle preflight requests globally
 
 app.use((req, res, next) => {
   res.cookie("mycookie", "value", {
