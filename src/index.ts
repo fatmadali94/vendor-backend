@@ -16,6 +16,11 @@ dotenv.config();
 
 const app = express();
 
+const corsOptions = {
+  origin: "*",
+};
+app.use(cors(corsOptions));
+
 app.use(express.static("public"));
 app.use(cookieParser());
 
@@ -40,13 +45,6 @@ app.use(compression());
 // );
 
 // app.options("*", cors()); // Handle preflight requests globally
-
-const corsOptions = {
-  origin: "*",
-  credentials: true, //access-control-allow-credentials:true
-  optionSuccessStatus: 200,
-};
-app.use(cors(corsOptions));
 
 app.use((req, res, next) => {
   res.cookie("mycookie", "value", {
