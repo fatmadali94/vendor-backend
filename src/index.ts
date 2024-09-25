@@ -41,16 +41,12 @@ app.use(compression());
 
 // app.options("*", cors()); // Handle preflight requests globally
 
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*"); // Allow all origins
-  res.setHeader("Access-Control-Allow-Credentials", "true"); // Allow credentials
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, PATCH, OPTIONS"
-  ); // Set allowed methods
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization"); // Set allowed headers
-  next();
-});
+const corsOptions = {
+  origin: "*",
+  credentials: true, //access-control-allow-credentials:true
+  optionSuccessStatus: 200,
+};
+app.use(cors(corsOptions));
 
 app.use((req, res, next) => {
   res.cookie("mycookie", "value", {
