@@ -7,26 +7,7 @@ on:
       - main # Deploy on push to the main branch
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      # Step 1: Checkout the code from the repository
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      # Step 2: Set up Node.js environment
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: "18"
-
-      # Step 3: Install dependencies
-      - name: Install dependencies
-        run: npm install
-
   deploy:
-    needs: build
     runs-on: ubuntu-latest
 
     steps:
@@ -42,11 +23,11 @@ jobs:
       - name: Deploy and restart app on VPS with PM2
         run: |
           sshpass -p "${{ secrets.VPS_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }} << EOF
-             cd /var/www/vendor-back  # Adjust path to where your app is hosted
-             git pull origin main      # Pull latest changes
-             npm install               # Install updated dependencies
-             pm2 stop vendor-back || true  # Stop the app if it's already running
+            cd /var/www/vendor-back/Hamidi_Backend  # Adjust path to where your app is hosted
+            git pull origin main      # Pull latest changes
+            npm install               # Install updated dependencies
+            pm2 stop vendor-back || true  # Stop the app if it's already running
             pm2 start src/index.ts --name "vendor-back"  # Start the app using PM2
             pm2 save                  # Save PM2 process list for restart on reboot
-            pm2 restart my-node-app   # Restart the app
+            pm2 restart vendor-back   # Restart the app
           EOF
