@@ -34,23 +34,6 @@ app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 // app.use(helmet());
 app.use(compression());
 
-// app.use(
-//   cors({
-//     // origin: [
-//     //   "https://demo-1.chiliscript.de",
-//     //   "http://localhost:5173",
-//     //   "https://localhost:5173",
-//     //   "localhost:5173",
-//     // ],
-//     origin: "*",
-//     // credentials: true,
-//     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-//     allowedHeaders: ["Content-Type", "Authorization"],
-//   })
-// );
-
-// app.options("*", cors()); // Handle preflight requests globally
-
 app.use((req, res, next) => {
   res.cookie("mycookie", "value", {
     sameSite: "none",
