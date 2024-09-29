@@ -21,9 +21,10 @@ app.use(
     origin: "*", // Specify the origin
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Authorization", "Content-Type"],
   })
 );
+app.options("*", cors()); // Handle preflight requests
 
 app.use(express.static("public"));
 app.use(cookieParser());
