@@ -10,6 +10,7 @@ interface IUnverifiedUser extends Document {
   password: string;
   address: string;
   cellphone: string;
+  age: string;
   phone: string;
   occupation:
     | "purchase_manager"
@@ -20,6 +21,7 @@ interface IUnverifiedUser extends Document {
     | "provider"
     | "other";
   role: "admin" | "provider" | "user";
+  sex: "man" | "woman" | "other";
   verificationCode: string;
   image: {
     public_id?: string;
@@ -57,7 +59,7 @@ const unverifiedUserSchema = new Schema<IUnverifiedUser>(
     },
     phone: {
       type: String,
-      required: true,
+      required: false,
     },
     cellphone: {
       type: String,
@@ -68,6 +70,10 @@ const unverifiedUserSchema = new Schema<IUnverifiedUser>(
       type: String,
       required: true,
     },
+    age: {
+      type: String,
+      required: true,
+    },
     id_number: {
       type: String,
       required: true,
@@ -75,7 +81,7 @@ const unverifiedUserSchema = new Schema<IUnverifiedUser>(
     },
     address: {
       type: String,
-      required: true,
+      required: false,
     },
     occupation: {
       type: String,
@@ -94,6 +100,11 @@ const unverifiedUserSchema = new Schema<IUnverifiedUser>(
       type: String,
       enum: ["admin", "provider", "user"],
       default: "user",
+    },
+    sex: {
+      type: String,
+      enum: ["man", "woman", "other"],
+      default: "other",
     },
     verificationCode: {
       type: String,

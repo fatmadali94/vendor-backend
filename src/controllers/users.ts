@@ -23,7 +23,6 @@ dotenv.config();
 
 export const registerUser = async (req: any, res: any) => {
   const data = req.body;
-  console.log("data", data);
   try {
     const verificationCode = crypto.randomBytes(3).toString("hex");
     const hashedPassword = await hashPassword(data.password);
@@ -63,7 +62,7 @@ export const verifyUser = async (req: any, res: any) => {
       verificationCode: code,
     });
     if (!unverifiedUser) {
-      return res.status(400).json({ message: "Invalid verification code" });
+      return res.status(400).json({ message: "کد ورودی اشتباه می باشد" });
     }
     const { verificationCode, ...userData } = unverifiedUser.toObject();
     const user = new User(userData);
@@ -97,13 +96,29 @@ export const resendUserVerificationCode = async (req: any, res: any) => {
   }
 };
 
+export const removeUnverifiedUser = async (req: any, res: any) => {
+  const { email } = req.body;
+  try {
+    const unverifiedUser = await UnverifiedUser.findOne({ email });
+    if (!unverifiedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    await UnverifiedUser.deleteOne({ email: unverifiedUser.email });
+    res.status(200).json({ message: "Verification code resent" });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
 export const loginUser = async (req: any, res: any) => {
   const { email, password } = req.body;
 
   try {
     const user = await User.findOne({ email });
     if (!user || !validatePassword(password, user.password)) {
-      return res.status(401).json({ message: "Invalid email or password" });
+      return res
+        .status(401)
+        .json({ message: "نام کاربری یا رمز عبور اشتباه است" });
     }
     const token = generateToken(user._id);
     res.status(200).json({

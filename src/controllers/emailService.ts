@@ -15,8 +15,11 @@ export const sendVerificationEmail = (email: string, code: any) => {
   const mailOptions = {
     from: process.env.EMAIL_USER,
     to: email,
-    subject: "Email Verification",
-    text: `Your verification code is ${code}`,
+    subject: "تایید ایمیل",
+    html: `
+    <p>:کد ورود شما </p>
+    <p style="font-size: 18px; font-weight: bold;">${code}</p>
+  `,
   };
 
   return transporter.sendMail(mailOptions);
@@ -26,8 +29,8 @@ export const sendWelcomeEmail = (email: any) => {
   const mailOptions = {
     from: process.env.EMAIL_USER,
     to: email,
-    subject: "Welcome!",
-    text: "Welcome to our platform!",
+    subject: "!خوش آمدید",
+    text: "!به ریرکو خوش آمدید",
   };
 
   return transporter.sendMail(mailOptions);

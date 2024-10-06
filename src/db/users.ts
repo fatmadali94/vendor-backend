@@ -12,6 +12,7 @@ interface IUser extends Document {
   resetPasswordExpires: Number;
   address: string;
   cellphone: string;
+  age: string;
   phone: string;
   occupation:
     | "purchase_manager"
@@ -22,6 +23,7 @@ interface IUser extends Document {
     | "provider"
     | "other";
   role: "admin" | "provider" | "user";
+  sex: "man" | "woman" | "other";
   image: {
     public_id?: string;
     url?: string;
@@ -58,12 +60,16 @@ const userSchema = new Schema<IUser>(
     },
     phone: {
       type: String,
-      required: true,
+      required: false,
     },
     cellphone: {
       type: String,
       required: true,
       unique: true,
+    },
+    age: {
+      type: String,
+      required: true,
     },
     password: {
       type: String,
@@ -78,7 +84,7 @@ const userSchema = new Schema<IUser>(
     },
     address: {
       type: String,
-      required: true,
+      required: false,
     },
     occupation: {
       type: String,
@@ -97,6 +103,11 @@ const userSchema = new Schema<IUser>(
       type: String,
       enum: ["admin", "provider", "user"],
       default: "user",
+    },
+    sex: {
+      type: String,
+      enum: ["man", "woman", "other"],
+      default: "other",
     },
   },
   { timestamps: true }

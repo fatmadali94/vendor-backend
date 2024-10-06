@@ -5,6 +5,7 @@ import {
   resendUserVerificationCode,
   verifyUser,
   updateUser,
+  removeUnverifiedUser,
 } from "../controllers/users";
 import {
   resendProviderVerificationCode,
@@ -13,6 +14,7 @@ import {
   loginProvider,
   updateProvider,
   getVerifiedProvider,
+  removeUnverifiedProvider,
 } from "../controllers/providers";
 import { getMe } from "../controllers/auth";
 import { protect, authorize } from "../middlewares/authMiddleware";
@@ -24,6 +26,7 @@ export default (router: express.Router) => [
   router.post("/resend-verify-user", resendUserVerificationCode),
   router.post("/user-login", loginUser),
   router.patch("/user-update", updateUser),
+  router.post("/remove-unverified-user", removeUnverifiedUser),
 
   // PROVIDERS ROUTES
   router.post("/provider-register", registerProvider),
@@ -32,6 +35,7 @@ export default (router: express.Router) => [
   router.post("/provider-login", loginProvider),
   router.patch("/provider-update", updateProvider),
   router.get("/verifiedProvider/:id", getVerifiedProvider),
+  router.post("/remove-unverified-provider", removeUnverifiedProvider),
 
   // router.get("/verified-providers", getAllVerifiedProviders),
 
