@@ -44,6 +44,19 @@ export const registerUser = async (req: any, res: any) => {
         },
       };
     }
+    const existingUser = await User.findOne({ email: newUserData.email });
+    if (existingUser) {
+      return res.status(409).json({ message: "کاربر ثبت شده است" });
+    }
+    const existingUnverifiedUser = await UnverifiedUser.findOne({
+      email: newUserData.email,
+    });
+    if (existingUnverifiedUser) {
+      return res.status(409).json({
+        message:
+          "درخواست شما قبلا ثبت شده است لطفا کد را وارد یا درخواست کد جدید دهید",
+      });
+    }
 
     const unverifiedUser = new UnverifiedUser(newUserData);
     await unverifiedUser.save();
