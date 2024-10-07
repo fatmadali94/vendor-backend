@@ -67,10 +67,7 @@ const userSchema = new Schema<IUser>(
       required: true,
       unique: true,
     },
-    age: {
-      type: String,
-      required: true,
-    },
+
     password: {
       type: String,
       required: true,
@@ -107,6 +104,11 @@ const userSchema = new Schema<IUser>(
     sex: {
       type: String,
       enum: ["man", "woman", "other"],
+      default: "other",
+    },
+    age: {
+      type: String,
+      enum: ["under", "20-30", "30-40", "40-50", "above", "other"],
       default: "other",
     },
   },
