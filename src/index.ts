@@ -22,7 +22,7 @@ const corsOptions = {
     "http://localhost:5174",
     "https://demo-1.chiliscript.de",
     "https://vendor.rierco.net",
-    "adminvendor.rierco.net",
+    "https://adminvendor.rierco.net",
   ], // Allow all origins
   credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
