@@ -13,12 +13,14 @@ interface IUnverifiedUser extends Document {
   age: string;
   phone: string;
   occupation:
-    | "purchase_manager"
-    | "student"
+    | "procurement"
+    | "technical_officer"
     | "startup_member"
-    | "provider"
-    | "observer"
-    | "provider"
+    | "quality_control"
+    | "research_development"
+    | "quality_assurance"
+    | "quality_assurance"
+    | "student"
     | "other";
   role: "admin" | "provider" | "user";
   sex: "man" | "woman" | "other";
@@ -86,15 +88,17 @@ const unverifiedUserSchema = new Schema<IUnverifiedUser>(
     occupation: {
       type: String,
       enum: [
-        "purchase_manager",
+        "procurement",
+        "technical_officer",
         "startup_member",
+        "quality_control",
+        "research_development",
+        "quality_assurance",
+        "quality_assurance",
         "student",
-        "provider",
-        "analyzer",
-        "observer",
         "other",
       ],
-      default: "purchase_manager",
+      default: "other",
     },
     role: {
       type: String,

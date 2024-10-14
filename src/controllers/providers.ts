@@ -18,6 +18,19 @@ import {
 dotenv.config();
 import cloudinary from "../utils/cloudinary";
 
+export const getAllProviders = async (
+  req: express.Request,
+  res: express.Response
+) => {
+  try {
+    const providers = await Provider.find();
+    return res.status(200).json(providers);
+  } catch (error) {
+    console.log(error);
+    return res.sendStatus(400);
+  }
+};
+
 export const registerProvider = async (req: any, res: any) => {
   const data = req.body;
   try {

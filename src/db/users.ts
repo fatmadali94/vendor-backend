@@ -1,6 +1,13 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
 import bcrypt from "bcrypt";
 
+interface IUploadedFile {
+  public_id: string;
+  url: string;
+  originalFilename: string;
+  fileType: string;
+}
+
 interface IUser extends Document {
   name: string;
   family_name: string;
@@ -14,13 +21,16 @@ interface IUser extends Document {
   cellphone: string;
   age: string;
   phone: string;
+  isVerified: boolean;
   occupation:
-    | "purchase_manager"
-    | "student"
+    | "procurement"
+    | "technical_officer"
     | "startup_member"
-    | "provider"
-    | "observer"
-    | "provider"
+    | "quality_control"
+    | "research_development"
+    | "quality_assurance"
+    | "quality_assurance"
+    | "student"
     | "other";
   role: "admin" | "provider" | "user";
   sex: "man" | "woman" | "other";
@@ -28,6 +38,7 @@ interface IUser extends Document {
     public_id?: string;
     url?: string;
   };
+  uploadedFiles: IUploadedFile[];
   matchPassword(enteredPassword: string): Promise<boolean>;
 }
 
@@ -43,6 +54,26 @@ const userSchema = new Schema<IUser>(
         required: false,
       },
     },
+    uploadedFiles: [
+      {
+        public_id: {
+          type: String,
+          required: false,
+        },
+        url: {
+          type: String,
+          required: false,
+        },
+        fileType: {
+          type: String,
+          required: false, // The file type (e.g., 'pdf', 'jpeg', etc.)
+        },
+        originalFilename: {
+          type: String,
+          required: false,
+        },
+      },
+    ],
     name: {
       type: String,
       required: true,
@@ -86,15 +117,17 @@ const userSchema = new Schema<IUser>(
     occupation: {
       type: String,
       enum: [
-        "purchase_manager",
+        "procurement",
+        "technical_officer",
         "startup_member",
+        "quality_control",
+        "research_development",
+        "quality_assurance",
+        "quality_assurance",
         "student",
-        "provider",
-        "analyzer",
-        "observer",
         "other",
       ],
-      default: "purchase_manager",
+      default: "other",
     },
     role: {
       type: String,
@@ -111,6 +144,7 @@ const userSchema = new Schema<IUser>(
       enum: ["under", "20-30", "30-40", "40-50", "above", "other"],
       default: "other",
     },
+    isVerified: { type: Boolean, default: false }, // Boolean f
   },
   { timestamps: true }
 );

@@ -7,7 +7,6 @@ import Provider from "../db/providers";
 dotenv.config();
 
 export const getMe = async (req: any, res: any) => {
-  console.log("this is coming from the getMe");
   try {
     let user = await User.findById(req.user._id).select("-password");
     if (!user) {
