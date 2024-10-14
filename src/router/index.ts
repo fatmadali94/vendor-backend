@@ -15,6 +15,7 @@ import offer from "./offer";
 import products from "./products";
 import resourceCenter from "./resourceCenter";
 import marketInformation from "./marketInformation";
+import tickets from "./tickets";
 const router = express.Router();
 
 export default (): express.Router => {
@@ -34,6 +35,7 @@ export default (): express.Router => {
   products(router);
   resourceCenter(router);
   marketInformation(router);
+  tickets(router);
 
   return router;
 };

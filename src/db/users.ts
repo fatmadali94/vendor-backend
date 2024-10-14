@@ -1,4 +1,4 @@
-import mongoose, { Document, Model, Schema } from "mongoose";
+import mongoose, { Document, Model, Schema, ObjectId } from "mongoose";
 import bcrypt from "bcrypt";
 
 interface IUploadedFile {
@@ -38,6 +38,7 @@ interface IUser extends Document {
     public_id?: string;
     url?: string;
   };
+  tickets: ObjectId[]; // Array of ticket ObjectIds
   uploadedFiles: IUploadedFile[];
   matchPassword(enteredPassword: string): Promise<boolean>;
 }
@@ -144,6 +145,7 @@ const userSchema = new Schema<IUser>(
       enum: ["under", "20-30", "30-40", "40-50", "above", "other"],
       default: "other",
     },
+    tickets: [{ type: mongoose.Schema.Types.ObjectId, ref: "Ticket" }],
     isVerified: { type: Boolean, default: false }, // Boolean f
   },
   { timestamps: true }

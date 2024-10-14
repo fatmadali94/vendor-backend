@@ -24,6 +24,7 @@ export const getAllMaterialGroups = async (
     return res.sendStatus(400);
   }
 };
+
 export const deleteMaterialGroup = async (
   req: express.Request,
   res: express.Response
