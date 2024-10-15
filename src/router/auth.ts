@@ -8,6 +8,8 @@ import {
   removeUnverifiedUser,
   getAllUsers,
   uploadUserFile,
+  userForgotPassword,
+  userResetPassword,
 } from "../controllers/users";
 import {
   resendProviderVerificationCode,
@@ -32,6 +34,8 @@ export default (router: express.Router) => [
   router.post("/remove-unverified-user", removeUnverifiedUser),
   router.get("/get-users", getAllUsers),
   router.post("/user-upload-file", uploadUserFile),
+  router.post("/forgot-password", userForgotPassword),
+  router.post("/reset-password", userResetPassword),
 
   // PROVIDERS ROUTES
   router.post("/provider-register", registerProvider),

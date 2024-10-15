@@ -237,15 +237,16 @@ export const userForgotPassword = async (req: any, res: any) => {
 
     await sendPasswordResetEmail(user.email, resetToken);
 
-    res.status(200).json({ message: "Password reset email sent" });
+    res.status(200).json({ message: "لینک پسورد با موفقیت ارسال شد " });
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    res
+      .status(500)
+      .json({ message: "مشکلی پیش آمده لطفا دقایقی دیگر تلاش کنید" });
   }
 };
 
 export const userResetPassword = async (req: any, res: any) => {
   const { token, newPassword } = req.body;
-
   try {
     const user: any = await User.findOne({
       resetPasswordToken: token,
@@ -256,14 +257,18 @@ export const userResetPassword = async (req: any, res: any) => {
       return res.status(400).json({ message: "Invalid or expired token" });
     }
 
-    user.password = hashPassword(newPassword);
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpires = undefined;
+    user.password = await hashPassword(newPassword);
+    user.resetPasswordToken = null;
+    user.resetPasswordExpires = null;
+
     await user.save();
 
-    res.status(200).json({ message: "Password has been reset" });
+    res.status(200).json({ message: "پسورد شما با موفقیت تغییر کرد" });
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    console.error("Error during password reset:", error);
+    res
+      .status(500)
+      .json({ message: "مشکلی پیش آمده لطفا دقایقی دیگر تلاش کنید", error });
   }
 };
 
