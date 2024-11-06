@@ -22,13 +22,16 @@ interface IUser extends Document {
   age: string;
   phone: string;
   isVerified: boolean;
+  companyId: {
+    type: Number;
+    required: true;
+  };
   occupation:
     | "procurement"
     | "technical_officer"
     | "startup_member"
     | "quality_control"
     | "research_development"
-    | "quality_assurance"
     | "quality_assurance"
     | "student"
     | "other";
@@ -38,6 +41,7 @@ interface IUser extends Document {
     public_id?: string;
     url?: string;
   };
+  ratings: ObjectId[]; // Array of rating ObjectIds
   tickets: ObjectId[]; // Array of ticket ObjectIds
   uploadedFiles: IUploadedFile[];
   matchPassword(enteredPassword: string): Promise<boolean>;
@@ -84,7 +88,6 @@ const userSchema = new Schema<IUser>(
       required: true,
     },
     username: { type: String, required: true, unique: true },
-
     email: {
       type: String,
       required: true,
@@ -113,6 +116,10 @@ const userSchema = new Schema<IUser>(
     },
     address: {
       type: String,
+      required: false,
+    },
+    companyId: {
+      type: Number,
       required: false,
     },
     occupation: {
@@ -145,6 +152,7 @@ const userSchema = new Schema<IUser>(
       enum: ["under", "20-30", "30-40", "40-50", "above", "other"],
       default: "other",
     },
+    ratings: [{ type: mongoose.Schema.Types.ObjectId, ref: "Rating" }],
     tickets: [{ type: mongoose.Schema.Types.ObjectId, ref: "Ticket" }],
     isVerified: { type: Boolean, default: false }, // Boolean f
   },

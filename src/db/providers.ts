@@ -1,7 +1,8 @@
 import mongoose, { Document, Model, Schema, ObjectId } from "mongoose";
 import MessageSchema from "./messages";
-import reviewSchema from "./reviews";
+import Rating from "./rating";
 import bcrypt from "bcrypt";
+import Comment from "./comments";
 
 interface MaterialRecord {
   materialgroup?: ObjectId;
@@ -16,12 +17,12 @@ interface PartRecord {
 }
 
 // Define the schema for reviews
-interface Review {
-  reviewer: ObjectId;
-  rating: number; // Rating out of 5, for example
-  comment?: string; // Optional comment field
-  timestamp: Date;
-}
+// interface Review {
+//   reviewer: ObjectId;
+//   rating: number; // Rating out of 5, for example
+//   comment?: string; // Optional comment field
+//   timestamp: Date;
+// }
 
 interface IUser extends Document {
   company_name: string;
@@ -48,7 +49,8 @@ interface IUser extends Document {
   records: (MaterialRecord | PartRecord)[];
   role: "admin" | "provider" | "user";
   messages: mongoose.Schema.Types.ObjectId[] | (typeof MessageSchema)[]; // Updated to include messageSchema
-  reviews: Review[];
+  comments: Comment[]; // Array of comments
+  ratings: mongoose.Schema.Types.ObjectId[] | (typeof Rating)[]; // Array of rating references
   isVerified: boolean;
   image: {
     public_id?: string;
@@ -188,7 +190,9 @@ const providerSchema = new Schema<IUser>({
     },
   ],
   messages: [MessageSchema], // Correct usage of messageSchema here
-  reviews: [reviewSchema], // Array of reviews
+  ratings: [{ type: mongoose.Schema.Types.ObjectId, ref: "Rating" }],
+  comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
+
   isVerified: { type: Boolean, default: false }, // Boolean f
   role: {
     type: String,
@@ -245,6 +249,16 @@ export const getVerifiedProviderById = (id: any) =>
     .populate({
       path: "records.materialgrade",
       model: "MaterialGrades", // And for material grades
+    })
+    .populate({
+      path: "ratings",
+      model: "Rating",
+      // select: "position companyId rating", // Only select specific fields from Rating
+    })
+    .populate({
+      path: "comments",
+      model: "Comment",
+      // select: "position companyId rating", // Only select specific fields from Rating
     })
     .exec();
 

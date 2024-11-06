@@ -58,7 +58,6 @@ export const createMarketInfo = async (
       },
       // url + "/subcategory/" + (req as unknown as MulterRequest).file.filename,
     });
-    console.log("newMarketInfo", newMarketInfo);
     await newMarketInfo.save();
     return res.status(200).json(newMarketInfo).end();
   } catch (error) {

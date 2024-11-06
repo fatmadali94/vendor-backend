@@ -52,6 +52,10 @@ const PartProviderSchema = new mongoose.Schema(
         },
       },
     ],
+    ratings: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "Rating", required: false },
+    ],
+    comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
   },
   {
     timestamps: true,
@@ -76,6 +80,11 @@ export const getPartProviders = () => {
       path: "records.partgeneralid",
       model: "PartGeneralIds", // And for material grades
     })
+    .populate({
+      path: "ratings",
+      model: "Rating",
+      // select: "position companyId rating", // Only select specific fields from Rating
+    })
     .exec();
 
   return partProviders;
@@ -93,6 +102,11 @@ export const getPartProviderById = (id: any) =>
     .populate({
       path: "records.partgeneralid",
       model: "PartGeneralIds", // And for material grades
+    })
+    .populate({
+      path: "comments",
+      model: "Comment",
+      // select: "position companyId rating", // Only select specific fields from Rating
     })
     .exec();
 

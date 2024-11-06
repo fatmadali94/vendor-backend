@@ -27,9 +27,6 @@ export const uploadUserFile = async (
 ) => {
   try {
     const { file, userId, originalFilename } = req.body;
-    // const resultOfSms = await sendSms(9178100755, "this is a test message");
-    // console.log("resultOfSms", resultOfSms);
-
     if (!file) {
       return res.status(400).json({ message: "File is required" });
     }
@@ -51,8 +48,6 @@ export const uploadUserFile = async (
       uploadOptions.resource_type = "raw";
     }
     const result = await cloudinary.uploader.upload(file, uploadOptions);
-
-    // console.log("result", result);
 
     const user = await User.findById(userId);
     if (!user) {

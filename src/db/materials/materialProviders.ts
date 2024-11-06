@@ -52,6 +52,10 @@ const MaterialProviderSchema = new mongoose.Schema(
         },
       },
     ],
+    ratings: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "Rating", required: false },
+    ],
+    comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
   },
   {
     timestamps: true,
@@ -95,6 +99,16 @@ export const getMaterialProviderById = (id: any) =>
     .populate({
       path: "records.materialgrade",
       model: "MaterialGrades", // And for material grades
+    })
+    .populate({
+      path: "ratings",
+      model: "Rating",
+      // select: "position companyId rating", // Only select specific fields from Rating
+    })
+    .populate({
+      path: "comments",
+      model: "Comment",
+      // select: "position companyId rating", // Only select specific fields from Rating
     })
     .exec();
 

@@ -2,7 +2,6 @@ import { MessageModel } from "../db/messages";
 
 export const sendMessage = async (req: any, res: any) => {
   const { content, subject, recipient, sender } = req.body;
-  console.log(content, subject, recipient, sender);
 
   if (!content || !recipient || !subject || !sender) {
     return res
