@@ -70,8 +70,8 @@ export const leaveRating = async (req: any, res: any) => {
       provider.ratings.push(savedRating._id);
       await provider.save();
     }
-
-    return res.status(200).json({ message: "Rating submitted successfully" });
+    const updatedRatings = await Rating.find({ provider: providerId });
+    return res.status(200).json({ ratings: updatedRatings });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Server error" });
