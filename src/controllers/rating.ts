@@ -71,7 +71,7 @@ export const leaveRating = async (req: any, res: any) => {
       await provider.save();
     }
     const updatedRatings = await Rating.find({ provider: providerId });
-    return res.status(200).json({ ratings: updatedRatings });
+    return res.status(200).json(updatedRatings);
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Server error" });
