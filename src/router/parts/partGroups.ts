@@ -4,13 +4,13 @@ import {
   deletePartGroup,
   createPartGroup,
   // getMaterialGroup,
-  // updateMaterialGroup,
+  updatePartGroup,
 } from "../../controllers/parts/partGroups";
 
 export default (router: express.Router) => [
   router.get("/partGroups", getAllPartGroups),
   router.delete("/partGroup/:id", deletePartGroup),
   router.post("/createPartGroup", createPartGroup),
-  // router.patch("/materialGroup/:id", updateMaterialGroup),
+  router.patch("/partGroup/:id", updatePartGroup),
   // router.get("/materialGroup/:id", getMaterialGroup),
 ];

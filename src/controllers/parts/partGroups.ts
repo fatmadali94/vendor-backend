@@ -3,6 +3,7 @@ import {
   deletePartGroupById,
   getPartGroups,
   partGroupModel,
+  updatePartGroupById,
 } from "../../db/parts/partGroups";
 import cloudinary from "../../utils/cloudinary";
 
@@ -61,6 +62,48 @@ export const createPartGroup = async (
     });
     await newPartGroup.save();
 
+    return res.status(200).json(newPartGroup).end();
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(400);
+  }
+};
+
+export const updatePartGroup = async (
+  req: express.Request,
+  res: express.Response
+) => {
+  try {
+    const { id } = req.params;
+    const previousPartGroup: any = await partGroupModel.find({
+      _id: id,
+    });
+
+    const updatedPartGroup: any = {
+      title: req.body.title ? req.body.title : previousPartGroup?.title,
+      description: req.body.description
+        ? req.body.description
+        : previousPartGroup?.description,
+      partNames: req.body.selectedIds
+        ? req.body.selectedIds
+        : previousPartGroup.partNames,
+    };
+    if (req.body.image) {
+      const imgId = previousPartGroup.image.public_id;
+      if (imgId) {
+        await cloudinary.uploader.destroy(imgId);
+      }
+      const newImg = await cloudinary.uploader.upload(req.body.image, {
+        folder: "partGroups",
+      });
+      updatedPartGroup.image = {
+        public_id: newImg.public_id,
+        url: newImg.secure_url,
+      };
+    }
+
+    const newPartGroup = await updatePartGroupById(id, updatedPartGroup);
+    console.log("newPartGroup", newPartGroup);
     return res.status(200).json(newPartGroup).end();
   } catch (error) {
     console.log(error);

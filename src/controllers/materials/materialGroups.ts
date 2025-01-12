@@ -5,6 +5,7 @@ import {
   // getMaterialGroupById,
   // updateMaterialGroupById,
   materialGroupModel,
+  updateMaterialGroupById,
 } from "../../db/materials/materialGroups";
 import cloudinary from "../../utils/cloudinary";
 
@@ -46,48 +47,50 @@ export const deleteMaterialGroup = async (
   }
 };
 
-// export const updateMaterialGroup = async (
-//   req: express.Request,
-//   res: express.Response
-// ) => {
-//   try {
-//     const { id } = req.params;
-//     const previousMaterialGroup: any = await materialGroupModel.find({
-//       _id: id,
-//     });
+export const updateMaterialGroup = async (
+  req: express.Request,
+  res: express.Response
+) => {
+  try {
+    const { id } = req.params;
+    const previousMaterialGroup: any = await materialGroupModel.find({
+      _id: id,
+    });
 
-//     const updatedMaterialGroup: any = {
-//       title: req.body.title ? req.body.title : previousMaterialGroup[0]?.title,
-//       description: req.body.description
-//         ? req.body.description
-//         : previousMaterialGroup[0]?.description,
-//     };
+    const updatedMaterialGroup: any = {
+      title: req.body.title ? req.body.title : previousMaterialGroup?.title,
+      description: req.body.description
+        ? req.body.description
+        : previousMaterialGroup?.description,
+      materialNames: req.body.selectedIds
+        ? req.body.selectedIds
+        : previousMaterialGroup.materialNames,
+    };
+    if (req.body.image) {
+      const imgId = previousMaterialGroup.image.public_id;
+      if (imgId) {
+        await cloudinary.uploader.destroy(imgId);
+      }
+      const newImg = await cloudinary.uploader.upload(req.body.image, {
+        folder: "materialGroups",
+      });
+      updatedMaterialGroup.image = {
+        public_id: newImg.public_id,
+        url: newImg.secure_url,
+      };
+    }
 
-//     if (previousMaterialGroup.image !== "") {
-//       const imgId = previousMaterialGroup[0].image.public_id;
-//       if (imgId) {
-//         await cloudinary.uploader.destroy(imgId);
-//       }
-//       const newImg = await cloudinary.uploader.upload(req.body.image, {
-//         folder: "materialGroups",
-//       });
-//       updatedMaterialGroup.image = {
-//         public_id: newImg.public_id,
-//         url: newImg.secure_url,
-//       };
-//     }
+    const newMaterialGroup = await updateMaterialGroupById(
+      id,
+      updatedMaterialGroup
+    );
 
-//     const newMaterialGroup = await updateMaterialGroupById(
-//       id,
-//       updatedMaterialGroup
-//     );
-
-//     return res.status(200).json(newMaterialGroup).end();
-//   } catch (error) {
-//     console.log(error);
-//     res.sendStatus(400);
-//   }
-// };
+    return res.status(200).json(newMaterialGroup).end();
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(400);
+  }
+};
 
 export const createMaterialGroup = async (
   req: express.Request,

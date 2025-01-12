@@ -3,7 +3,7 @@ import {
   getAllPartNames,
   deletePartName,
   createPartName,
-  // updateMaterialName,
+  updatePartName,
   // getMaterialName,
 } from "../../controllers/parts/partNames";
 
@@ -11,6 +11,6 @@ export default (router: express.Router) => [
   router.get("/partNames", getAllPartNames),
   router.delete("/partName/:id", deletePartName),
   router.post("/createPartName", createPartName),
-  // router.patch("/materialName/:id", updateMaterialName),
+  router.patch("/partName/:id", updatePartName),
   // router.get("/materialName/:id", getMaterialName),
 ];

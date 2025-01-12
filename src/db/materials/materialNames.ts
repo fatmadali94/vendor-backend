@@ -14,6 +14,9 @@ const MaterialNameSchema = new mongoose.Schema(
     slug: { type: String, required: false },
     title: { type: String, required: true },
     description: { type: String, required: true },
+    materialGrades: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "MaterialGrades" },
+    ],
   },
   {
     timestamps: true,
@@ -24,7 +27,14 @@ export const materialNameModel = mongoose.model(
   "MaterialNames",
   MaterialNameSchema
 );
-export const getMaterialNames = () => materialNameModel.find();
+export const getMaterialNames = () =>
+  materialNameModel
+    .find()
+    .populate({
+      path: "materialGrades",
+      model: "MaterialGrades", // Ensures that Mongoose knows which model to use for population
+    })
+    .exec();
 
 export const getMaterialNameById = (id: string) =>
   materialNameModel.findById(id);

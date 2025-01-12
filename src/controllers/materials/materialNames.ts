@@ -5,6 +5,7 @@ import {
   getMaterialNames,
   // getMaterialNameById,
   deleteMaterialNameById,
+  updateMaterialNameById,
   // updateMaterialNameById,
 } from "../../db/materials/materialNames";
 import { materialNameModel } from "../../db/materials/materialNames";
@@ -84,44 +85,48 @@ export const createMaterialName = async (
 //   }
 // };
 
-// export const updateMaterialName = async (
-//   req: express.Request,
-//   res: express.Response
-// ) => {
-//   try {
-//     const _id = req.params.id;
-//     const oldMaterialName: any = await materialNameModel.findOne({ _id });
-//     const updatedMaterialName: any = {
-//       title: req.body.title ? req.body.title : oldMaterialName.title,
-//       description: req.body.description
-//         ? req.body.description
-//         : oldMaterialName.description,
-//       slug: req.body.slug ? req.body.slug : oldMaterialName.slug,
-//     };
-//     if (oldMaterialName.image !== "") {
-//       // const imgId = oldMaterialName[0].image.public_id;
-//       const imgId = oldMaterialName.image.public_id;
-//       if (imgId) {
-//         await cloudinary.uploader.destroy(imgId);
-//       }
-//       const newImg = await cloudinary.uploader.upload(req.body.image, {
-//         folder: "materialnames",
-//       });
-//       updatedMaterialName.image = {
-//         public_id: newImg.public_id,
-//         url: newImg.secure_url,
-//       };
-//     }
+export const updateMaterialName = async (
+  req: express.Request,
+  res: express.Response
+) => {
+  try {
+    const { id } = req.params;
+    const previousMaterialName: any = await materialNameModel.find({
+      _id: id,
+    });
 
-//     if (oldMaterialName) {
-//       Object.assign(oldMaterialName, updatedMaterialName);
-//     }
+    const updatedMaterialName: any = {
+      title: req.body.title ? req.body.title : previousMaterialName.title,
+      description: req.body.description
+        ? req.body.description
+        : previousMaterialName.description,
+      slug: req.body.slug ? req.body.slug : previousMaterialName.slug,
+      materialGrades: req.body.selectedIds
+        ? req.body.selectedIds
+        : previousMaterialName.materialGrades,
+    };
 
-//     const newMaterialName = await oldMaterialName!.save();
+    if (req.body.image) {
+      const imgId = previousMaterialName.image.public_id;
+      if (imgId) {
+        await cloudinary.uploader.destroy(imgId);
+      }
+      const newImg = await cloudinary.uploader.upload(req.body.image, {
+        folder: "materialnames",
+      });
+      updatedMaterialName.image = {
+        public_id: newImg.public_id,
+        url: newImg.secure_url,
+      };
+    }
+    const newMaterialGroup = await updateMaterialNameById(
+      id,
+      updatedMaterialName
+    );
 
-//     return res.status(200).json(newMaterialName).end();
-//   } catch (error) {
-//     console.log(error);
-//     res.sendStatus(400);
-//   }
-// };
+    return res.status(200).json(newMaterialGroup).end();
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(400);
+  }
+};

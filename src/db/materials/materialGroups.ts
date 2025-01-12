@@ -13,6 +13,9 @@ const MaterialGroupSchema = new mongoose.Schema(
     },
     title: { type: String, required: true },
     description: { type: String, required: true },
+    materialNames: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "MaterialNames" },
+    ],
   },
   {
     timestamps: true,
@@ -23,10 +26,23 @@ export const materialGroupModel = mongoose.model(
   "MaterialGroups",
   MaterialGroupSchema
 );
-export const getMaterialGroups = () => materialGroupModel.find();
+export const getMaterialGroups = () =>
+  materialGroupModel
+    .find()
+    .populate({
+      path: "materialNames",
+      model: "MaterialNames", // Ensures that Mongoose knows which model to use for population
+    })
+    .exec();
 
 export const getMaterialGroupById = (id: string) =>
-  materialGroupModel.findById(id);
+  materialGroupModel
+    .findById(id)
+    .populate({
+      path: "materialNames",
+      model: "MaterialNames", // Ensures that Mongoose knows which model to use for population
+    })
+    .exec();
 
 // export const createMaterialGroup = (values: Record<string, any>) =>
 //   new materialGroupModel(values).save().then((user) => user.toObject());
