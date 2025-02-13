@@ -17,10 +17,8 @@ interface IUser extends Document {
   password: string;
   resetPasswordToken: string;
   resetPasswordExpires: Number;
-  address: string;
   cellphone: string;
   age: string;
-  phone: string;
   isVerified: boolean;
   companyId: {
     type: Number;
@@ -37,6 +35,20 @@ interface IUser extends Document {
     | "other";
   role: "admin" | "provider" | "user";
   sex: "man" | "woman" | "other";
+  user_company: 
+  | "none"
+  | "Kavir_tire"
+  | "Barez_tire"
+  | "Khoozestan_tire"
+  | "Kian_tire"
+  | "iran_tire"
+  | "razi_tire"
+  | "dena_tire"
+  | "artavil_tire"
+  | "pars_tire"
+  | "iranyasa_tire"
+  | "yazd_tire"
+
   image: {
     public_id?: string;
     url?: string;
@@ -93,10 +105,6 @@ const userSchema = new Schema<IUser>(
       required: true,
       unique: true,
     },
-    phone: {
-      type: String,
-      required: false,
-    },
     cellphone: {
       type: String,
       required: true,
@@ -113,10 +121,6 @@ const userSchema = new Schema<IUser>(
       type: String,
       required: true,
       unique: true,
-    },
-    address: {
-      type: String,
-      required: false,
     },
     companyId: {
       type: Number,
@@ -151,6 +155,24 @@ const userSchema = new Schema<IUser>(
       type: String,
       enum: ["under", "20-30", "30-40", "40-50", "above", "other"],
       default: "other",
+    },
+    user_company: {
+      type: String,
+      enum: [
+         "none",
+         "Kavir_tire",
+         "Barez_tire",
+         "Khoozestan_tire",
+         "Kian_tire",
+         "iran_tire",
+         "razi_tire",
+         "dena_tire",
+         "artavil_tire",
+         "pars_tire",
+         "iranyasa_tire",
+         "yazd_tire",
+      ],
+      default: "none"
     },
     ratings: [{ type: mongoose.Schema.Types.ObjectId, ref: "Rating" }],
     tickets: [{ type: mongoose.Schema.Types.ObjectId, ref: "Ticket" }],

@@ -4,6 +4,13 @@ import Rating from "./rating";
 import bcrypt from "bcrypt";
 import Comment from "./comments";
 
+interface IUploadedFile {
+  public_id: string;
+  url: string;
+  originalFilename: string;
+  fileType: string;
+}
+
 interface MaterialRecord {
   materialgroup?: ObjectId;
   materialname?: ObjectId;
@@ -25,17 +32,20 @@ interface PartRecord {
 // }
 
 interface IUser extends Document {
-  company_name: string;
-  phone: number;
-  cellphone: number;
-  id_number: number;
-  ceo_cellphone: number;
-  foundation_year: number;
-  postal_code: number;
-  fax_number: number;
-  economical_number: number;
-  email: string;
+  description: string;
+  fax_number: string;
   ceo_name: string;
+  company_name: string;
+  phone: string;
+  cellphone: string;
+  id_number: string;
+  foundation_year: string;
+  postal_code: string;
+  economical_number: string;
+  email: string;
+  company_type: string;
+  export: string;
+  knowledgebased: string;
   website_address: string;
   country: string;
   city: string;
@@ -56,10 +66,44 @@ interface IUser extends Document {
     public_id?: string;
     url?: string;
   };
+  uploadedFiles: IUploadedFile[];
   matchPassword(enteredPassword: string): Promise<boolean>;
 }
 
 const providerSchema = new Schema<IUser>({
+
+  uploadedFiles: [
+    {
+      public_id: {
+        type: String,
+        required: false,
+      },
+      url: {
+        type: String,
+        required: false,
+      },
+      fileType: {
+        type: String,
+        required: false, // The file type (e.g., 'pdf', 'jpeg', etc.)
+      },
+      originalFilename: {
+        type: String,
+        required: false,
+      },
+    },
+  ], 
+  description: {
+    type: String,
+  required: false
+  },
+  fax_number: {
+    type: String,
+  required: false,
+  },
+  ceo_name: {
+    type: String,
+  required: false
+  },
   image: {
     public_id: {
       type: String,
@@ -72,15 +116,23 @@ const providerSchema = new Schema<IUser>({
   },
   company_name: {
     type: String,
-    required: true,
+    required: false,
   },
-  ceo_name: {
+  company_type: {
+    required: false,
     type: String,
-    required: true,
+  },
+  export: {
+    required: false,
+    type: String,
+  },
+  knowledgebased: {
+    required: false,
+    type: String,
   },
   username: {
-    type: String,
     required: true,
+    type: String,
   },
   website_address: {
     type: String,
@@ -92,49 +144,39 @@ const providerSchema = new Schema<IUser>({
     unique: true,
   },
   phone: {
-    type: Number,
-    required: true,
-  },
-  ceo_cellphone: {
-    type: Number,
-    required: true,
+    type: String,
+    required: false,
   },
   cellphone: {
-    type: Number,
-    required: true,
+    type: String,
+    required: false,
     unique: true,
   },
   password: {
     type: String,
     required: true,
   },
-  resetPasswordToken: { type: String, required: false },
-  resetPasswordExpires: { type: Number, required: false },
   id_number: {
-    type: Number,
-    required: true,
+    type: String,
+    required: false,
     unique: true,
   },
   foundation_year: {
-    type: Number,
+    type: String,
     required: false,
   },
   postal_code: {
-    type: Number,
-    required: false,
-  },
-  fax_number: {
-    type: Number,
+    type: String,
     required: false,
   },
   economical_number: {
-    type: Number,
-    required: false,
+    type: String,
+    required: true,
     unique: true,
   },
   address: {
     type: String,
-    required: true,
+    required: false,
   },
   country: {
     type: String,
@@ -146,11 +188,11 @@ const providerSchema = new Schema<IUser>({
   },
   form_filler_name: {
     type: String,
-    required: true,
+    required: false,
   },
   form_filler_position: {
     type: String,
-    required: true,
+    required: false,
   },
 
   records: [

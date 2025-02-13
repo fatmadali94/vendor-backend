@@ -15,16 +15,16 @@ interface PartRecord {
 
 interface IUnverifiedProvider extends Document {
   company_name: string;
-  phone: number;
-  cellphone: number;
-  id_number: number;
-  ceo_cellphone: number;
-  foundation_year: number;
-  postal_code: number;
-  fax_number: number;
-  economical_number: number;
+  phone: string;
+  cellphone: string;
+  id_number: string;
+  foundation_year: string;
+  postal_code: string;
+  economical_number: string;
   email: string;
-  ceo_name: string;
+  company_type: string;
+  export: string;
+  knowledgebased: string;
   website_address: string;
   country: string;
   city: string;
@@ -56,10 +56,18 @@ const unverifiedProviderSchema = new Schema<IUnverifiedProvider>({
   },
   company_name: {
     type: String,
-    required: true,
+    required: false,
   },
-  ceo_name: {
-    required: true,
+  company_type: {
+    required: false,
+    type: String,
+  },
+  export: {
+    required: false,
+    type: String,
+  },
+  knowledgebased: {
+    required: false,
     type: String,
   },
   username: {
@@ -76,16 +84,12 @@ const unverifiedProviderSchema = new Schema<IUnverifiedProvider>({
     unique: true,
   },
   phone: {
-    type: Number,
-    required: true,
-  },
-  ceo_cellphone: {
-    type: Number,
-    required: true,
+    type: String,
+    required: false,
   },
   cellphone: {
-    type: Number,
-    required: true,
+    type: String,
+    required: false,
     unique: true,
   },
   password: {
@@ -93,31 +97,26 @@ const unverifiedProviderSchema = new Schema<IUnverifiedProvider>({
     required: true,
   },
   id_number: {
-    type: Number,
-    required: true,
+    type: String,
+    required: false,
     unique: true,
   },
   foundation_year: {
-    type: Number,
+    type: String,
     required: false,
   },
   postal_code: {
-    type: Number,
-    required: false,
-  },
-  fax_number: {
-    type: Number,
+    type: String,
     required: false,
   },
   economical_number: {
-    type: Number,
-    required: false,
-    unique: true,
-  },
-
-  address: {
     type: String,
     required: true,
+    unique: true,
+  },
+  address: {
+    type: String,
+    required: false,
   },
   country: {
     type: String,
@@ -129,11 +128,11 @@ const unverifiedProviderSchema = new Schema<IUnverifiedProvider>({
   },
   form_filler_name: {
     type: String,
-    required: true,
+    required: false,
   },
   form_filler_position: {
     type: String,
-    required: true,
+    required: false,
   },
   verificationCode: {
     type: String,

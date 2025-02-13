@@ -56,7 +56,7 @@ export const updateMaterialGroup = async (
     const previousMaterialGroup: any = await materialGroupModel.find({
       _id: id,
     });
-
+    
     const updatedMaterialGroup: any = {
       title: req.body.title ? req.body.title : previousMaterialGroup?.title,
       description: req.body.description

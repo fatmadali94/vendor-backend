@@ -15,8 +15,79 @@ import {
   generateToken,
   validatePassword,
 } from "../utils/helpers";
-dotenv.config();
 import cloudinary from "../utils/cloudinary";
+
+dotenv.config();
+
+
+export const uploadProviderFile = async (
+  req: express.Request,
+  res: express.Response
+) => {
+  try {
+    const { file, providerId, originalFilename } = req.body;
+
+    if (!file) {
+      return res.status(400).json({ message: "File is required" });
+    }
+
+    if (!providerId) {
+      return res.status(400).json({ message: "Provider ID is required" });
+    }
+
+    const fileSizeInBytes = Buffer.byteLength(file, "utf-8");
+    const maxSizeInBytes = 10 * 1024 * 1024; // ✅ 10MB Limit
+
+    if (fileSizeInBytes > maxSizeInBytes) {
+      return res.status(400).json({ message: "File size exceeds 10MB limit" });
+    }
+
+    const fileType = file.split(";")[0].split("/")[1].toLowerCase();
+
+    let uploadOptions: {
+      folder: string;
+      resource_type?: "image" | "video" | "raw" | "auto";
+    } = {
+      folder: `provider_uploads/${providerId}`,
+    };
+
+    if (fileType === "pdf") {
+      uploadOptions.resource_type = "raw";
+    }
+
+    // ✅ Upload to Cloudinary
+    const result = await cloudinary.uploader.upload(file, uploadOptions);
+
+    // ✅ Find provider in DB
+    const provider = await Provider.findById(providerId);
+    if (!provider) {
+      return res.status(404).json({ message: "Provider not found" });
+    }
+
+    // ✅ Create file object
+    const newFile = {
+      public_id: result.public_id,
+      url: result.secure_url,
+      filename: result.original_filename,
+      fileType,
+      originalFilename,
+    };
+
+    // ✅ Add to uploadedFiles array
+    provider.uploadedFiles = provider.uploadedFiles || [];
+    provider.uploadedFiles.push(newFile);
+    await provider.save();
+
+    res.status(200).json({
+      message: "File uploaded successfully",
+      file: newFile,
+    });
+  } catch (error) {
+    console.error("Error uploading file:", error);
+    res.status(500).json({ message: "Server error. Please try again later." });
+  }
+};
+
 
 export const getAllProviders = async (
   req: express.Request,
@@ -26,7 +97,6 @@ export const getAllProviders = async (
     const providers = await Provider.find();
     return res.status(200).json(providers);
   } catch (error) {
-    console.log(error);
     return res.sendStatus(400);
   }
 };
@@ -241,7 +311,7 @@ export const updateProvider = async (req: any, res: any) => {
     res
       .status(500)
       .json({ message: "An error occurred while updating the user." });
-  }
+      }
 };
 
 // export const getAllVerifiedProviders = async (req: any, res: any) => {
@@ -259,9 +329,53 @@ export const getVerifiedProvider = async (
 ) => {
   try {
     const { id } = req.params;
-    const provider = await getVerifiedProviderById(id);
+    const provider = await Provider.findById(id); // No need for .populate()
+
+    if (!provider) {
+      return res.status(404).json({ message: "Provider not found" });
+    }
+    // Remove invalid files (those missing `url` or with zero size)
+    provider.uploadedFiles = provider.uploadedFiles.filter(
+      (file) => file.url && file.originalFilename
+    );    
     return res.status(200).json(provider);
   } catch (error) {
-    res.sendStatus(400);
+    console.error("Error fetching provider:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const deleteUploadedFile = async (
+  req: express.Request,
+  res: express.Response
+) => {
+  try {
+    const { providerId, fileId, publicId } = req.body;
+
+    if (!providerId || !fileId || !publicId) {
+      return res.status(400).json({ message: "Missing required parameters" });
+    }
+
+    // ✅ Delete file from Cloudinary
+    await cloudinary.uploader.destroy(publicId);
+
+    // ✅ Remove the file reference from MongoDB
+    const provider = await Provider.findByIdAndUpdate(
+      providerId,
+      { $pull: { uploadedFiles: { _id: fileId } } },
+      { new: true } // Returns the updated provider
+    );
+
+    if (!provider) {
+      return res.status(404).json({ message: "Provider not found" });
+    }
+
+    res.status(200).json({
+      message: "File deleted successfully",
+      uploadedFiles: provider.uploadedFiles, // Return updated files list
+    });
+  } catch (error) {
+    console.error("Error deleting file:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };

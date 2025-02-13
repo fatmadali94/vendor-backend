@@ -20,6 +20,8 @@ import {
   getVerifiedProvider,
   removeUnverifiedProvider,
   getAllProviders,
+  uploadProviderFile,
+  deleteUploadedFile,
 } from "../controllers/providers";
 import { getMe } from "../controllers/auth";
 import { protect, authorize } from "../middlewares/authMiddleware";
@@ -46,6 +48,8 @@ export default (router: express.Router) => [
   router.get("/verifiedProvider/:id", getVerifiedProvider),
   router.post("/remove-unverified-provider", removeUnverifiedProvider),
   router.get("/get-providers", getAllProviders),
+  router.post("/provider-upload-file", uploadProviderFile),
+  router.post("/provider-delete-file", deleteUploadedFile),
 
   // router.get("/verified-providers", getAllVerifiedProviders),
 

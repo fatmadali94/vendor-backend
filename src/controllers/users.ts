@@ -94,12 +94,13 @@ export const registerUser = async (req: any, res: any) => {
   try {
     const verificationCode = crypto.randomBytes(3).toString("hex");
     const hashedPassword = await hashPassword(data.password);
-
+    console.log(data)
     let newUserData = {
       ...data,
       password: hashedPassword,
       verificationCode,
     };
+    console.log(newUserData)
     if (req.body.image) {
       const result = await cloudinary.uploader.upload(req.body.image, {
         folder: "verifiedUsers", // Upload to the "users" folder in Cloudinary
@@ -109,9 +110,10 @@ export const registerUser = async (req: any, res: any) => {
         image: {
           public_id: result.public_id,
           url: result.secure_url,
-        },
+        },       
       };
-    }
+      console.log(newUserData)
+    }   
     const existingUser = await User.findOne({ email: newUserData.email });
     if (existingUser) {
       return res.status(409).json({ message: "کاربر ثبت شده است" });
@@ -171,7 +173,7 @@ export const resendUserVerificationCode = async (req: any, res: any) => {
 
     await sendVerificationEmail(unverifiedUser.email, verificationCode);
 
-    res.status(200).json({ message: "Verification code resent" });
+    res.status(200).json({ message: "کد تایید دوباره ارسال شد" });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -182,10 +184,10 @@ export const removeUnverifiedUser = async (req: any, res: any) => {
   try {
     const unverifiedUser = await UnverifiedUser.findOne({ email });
     if (!unverifiedUser) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: "کاربری پیدا نشد" });
     }
     await UnverifiedUser.deleteOne({ email: unverifiedUser.email });
-    res.status(200).json({ message: "Verification code resent" });
+    res.status(200).json({ message: "کد تایید دوباره ارسال شد" });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -203,7 +205,7 @@ export const loginUser = async (req: any, res: any) => {
     }
     const token = generateToken(user._id);
     res.status(200).json({
-      message: "Login successful",
+      message: "ورود با موفقیت همراه بود",
       token,
       user: {
         id: user._id,
@@ -222,7 +224,7 @@ export const userForgotPassword = async (req: any, res: any) => {
   try {
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: "کاربری پیدا نشد" });
     }
 
     const resetToken = crypto.randomBytes(32).toString("hex");
@@ -274,7 +276,7 @@ export const updateUser = async (req: any, res: any) => {
     let user;
     user = await User.findByIdAndUpdate(userId, updateData, { new: true });
     if (!user) {
-      return res.status(404).json({ message: "User not found." });
+      return res.status(404).json({ message: "کاربری پیدا نشد." });
     }
 
     res.status(200).json({ user, message: "User updated successfully." });

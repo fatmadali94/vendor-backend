@@ -8,10 +8,8 @@ interface IUnverifiedUser extends Document {
   email: string;
   username: string;
   password: string;
-  address: string;
   cellphone: string;
   age: string;
-  phone: string;
   occupation:
     | "procurement"
     | "technical_officer"
@@ -24,6 +22,19 @@ interface IUnverifiedUser extends Document {
     | "other";
   role: "admin" | "provider" | "user";
   sex: "man" | "woman" | "other";
+  user_company: 
+  | "none"
+  | "Kavir_tire"
+  | "Barez_tire"
+  | "Khoozestan_tire"
+  | "Kian_tire"
+  | "iran_tire"
+  | "razi_tire"
+  | "dena_tire"
+  | "artavil_tire"
+  | "pars_tire"
+  | "iranyasa_tire"
+  | "yazd_tire"
   verificationCode: string;
   image: {
     public_id?: string;
@@ -59,10 +70,6 @@ const unverifiedUserSchema = new Schema<IUnverifiedUser>(
       required: true,
       unique: true,
     },
-    phone: {
-      type: String,
-      required: false,
-    },
     cellphone: {
       type: String,
       required: true,
@@ -80,10 +87,6 @@ const unverifiedUserSchema = new Schema<IUnverifiedUser>(
       type: String,
       required: true,
       unique: true,
-    },
-    address: {
-      type: String,
-      required: false,
     },
     occupation: {
       type: String,
@@ -109,6 +112,24 @@ const unverifiedUserSchema = new Schema<IUnverifiedUser>(
       type: String,
       enum: ["man", "woman", "other"],
       default: "other",
+    },
+    user_company: {
+      type: String,
+      enum: [
+         "none",
+         "Kavir_tire",
+         "Barez_tire",
+         "Khoozestan_tire",
+         "Kian_tire",
+         "iran_tire",
+         "razi_tire",
+         "dena_tire",
+         "artavil_tire",
+         "pars_tire",
+         "iranyasa_tire",
+         "yazd_tire",
+      ],
+      default: "none"
     },
     verificationCode: {
       type: String,
