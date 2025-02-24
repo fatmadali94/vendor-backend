@@ -305,45 +305,39 @@ export const updateProvider = async (
       return res.status(400).json({ message: "Missing provider ID" });
     }
 
-    let updateData: any = {};
+    const provider = await Provider.findById(userId);
+    if (!provider) {
+      return res.status(404).json({ message: "User not found." });
+    }
 
     if (formData) {
-      updateData = { ...updateData, ...formData };
+      Object.assign(provider, formData);
     }
 
     if (records && Array.isArray(records)) {
-      updateData.records = records;
+      provider.records = records;
     }
 
-    if (image && typeof image === "string") {
-      const provider = await Provider.findById(userId);
-      if (!provider) {
-        return res.status(404).json({ message: "User not found." });
-      }
+    
+    if (image && typeof image === "object" && image.base64) { 
       if (provider.image?.public_id) {
         await cloudinary.uploader.destroy(provider.image.public_id);
       }
-      const result = await cloudinary.uploader.upload(image, {
+    
+      const result = await cloudinary.uploader.upload(image.base64, {
         folder: "verifiedProviders",
       });
-      updateData.image = {
+    
+      provider.image = {
         public_id: result.public_id,
         url: result.secure_url,
       };
     }
 
-    const updatedProvider = await Provider.findByIdAndUpdate(
-      userId,
-      { $set: updateData }, 
-      { new: true } 
-    );
-
-    if (!updatedProvider) {
-      return res.status(404).json({ message: "User not found after update." });
-    }
+    await provider.save();
 
     return res.status(200).json({
-      provider: updatedProvider,
+      provider,
       message: "User updated successfully.",
     });
   } catch (error: unknown) {
@@ -360,6 +354,7 @@ export const updateProvider = async (
     }
   }
 };
+
 
 
 
