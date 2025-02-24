@@ -327,13 +327,13 @@ export const updateProvider = async (
       const result = await cloudinary.uploader.upload(image.base64, {
         folder: "verifiedProviders",
       });
-    
+    console.log(result)
       provider.image = {
         public_id: result.public_id,
         url: result.secure_url,
       };
     }
-
+console.log(provider)
     await provider.save();
 
     return res.status(200).json({
