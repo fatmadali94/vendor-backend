@@ -107,15 +107,15 @@ export const registerProvider = async (req: any, res: any) => {
     const processedRecords = data.records.map((record: any) => {
       if (record.materialgroup || record.materialname || record.materialgrade) {
         return {
-          materialgroup: record.materialgroup?.id,
-          materialname: record.materialname?.id,
-          materialgrade: record.materialgrade?.id,
+          materialgroup: record.materialgroup,
+          materialname: record.materialname,
+          materialgrade: record.materialgrade
         };
       } else if (record.partgroup || record.partname || record.partgeneralid) {
         return {
-          partgroup: record.partgroup?.id,
-          partname: record.partname?.id,
-          partgeneralid: record.partgeneralid?.id,
+          partgroup: record.partgroup,
+          partname: record.partname,
+          partgeneralid: record.partgeneralid
         };
       }
       return {};
@@ -294,25 +294,74 @@ export const getMe = async (req: any, res: any) => {
   }
 };
 
-export const updateProvider = async (req: any, res: any) => {
+export const updateProvider = async (
+  req: express.Request,
+  res: express.Response
+) => {
   try {
-    const { userId, ...updateData } = req.body;
+    const { userId, formData, records, image } = req.body;
 
-    let provider;
-    provider = await Provider.findByIdAndUpdate(userId, updateData, {
-      new: true,
-    });
-    if (!provider) {
-      return res.status(404).json({ message: "User not found." });
+    if (!userId) {
+      return res.status(400).json({ message: "Missing provider ID" });
     }
 
-    res.status(200).json({ provider, message: "User updated successfully." });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "An error occurred while updating the user." });
+    let updateData: any = {};
+
+    if (formData) {
+      updateData = { ...updateData, ...formData };
+    }
+
+    if (records && Array.isArray(records)) {
+      updateData.records = records;
+    }
+
+    if (image && typeof image === "string") {
+      const provider = await Provider.findById(userId);
+      if (!provider) {
+        return res.status(404).json({ message: "User not found." });
       }
+      if (provider.image?.public_id) {
+        await cloudinary.uploader.destroy(provider.image.public_id);
+      }
+      const result = await cloudinary.uploader.upload(image, {
+        folder: "verifiedProviders",
+      });
+      updateData.image = {
+        public_id: result.public_id,
+        url: result.secure_url,
+      };
+    }
+
+    const updatedProvider = await Provider.findByIdAndUpdate(
+      userId,
+      { $set: updateData }, 
+      { new: true } 
+    );
+
+    if (!updatedProvider) {
+      return res.status(404).json({ message: "User not found after update." });
+    }
+
+    return res.status(200).json({
+      provider: updatedProvider,
+      message: "User updated successfully.",
+    });
+  } catch (error: unknown) {
+    console.error("Error updating provider:", error);
+    if (error instanceof Error) {
+      return res.status(500).json({
+        message: "An error occurred while updating the provider.",
+        error: error.message,
+      });
+    } else {
+      return res.status(500).json({
+        message: "An unknown error occurred while updating the provider.",
+      });
+    }
+  }
 };
+
+
 
 // export const getAllVerifiedProviders = async (req: any, res: any) => {
 //   try {
@@ -355,11 +404,7 @@ export const deleteUploadedFile = async (
     if (!providerId || !fileId || !publicId) {
       return res.status(400).json({ message: "Missing required parameters" });
     }
-
-    // ✅ Delete file from Cloudinary
     await cloudinary.uploader.destroy(publicId);
-
-    // ✅ Remove the file reference from MongoDB
     const provider = await Provider.findByIdAndUpdate(
       providerId,
       { $pull: { uploadedFiles: { _id: fileId } } },
@@ -379,3 +424,69 @@ export const deleteUploadedFile = async (
     res.status(500).json({ message: "Server error" });
   }
 };
+
+
+// export const updateProviderImage = async (
+//   req: express.Request,
+//   res: express.Response
+// ) => {
+//   try {
+//     const { providerId, image } = req.body; // Extract providerId and image from request body
+
+//     // Find the provider in the database
+//     const provider = await Provider.findById(providerId);
+//     if (!provider) {
+//       return res.status(404).json({ message: "Provider not found" });
+//     }
+
+//     // Delete old image from Cloudinary if it exists
+//     if (provider.image?.public_id) {
+//       await cloudinary.uploader.destroy(provider.image.public_id);
+//     }
+
+//     // Upload new image to Cloudinary
+//     const result = await cloudinary.uploader.upload(image, {
+//       folder: "verifiedProviders",
+//     });
+
+//     // Update provider's image in MongoDB
+//     provider.image = {
+//       public_id: result.public_id,
+//       url: result.secure_url,
+//     };
+//     await provider.save();
+
+//     res.status(200).json({
+//       message: "Profile image updated successfully",
+//       image: provider.image,
+//     });
+//   } catch (error) {
+//     res.status(500).json({ message: "Error updating profile image", error });
+//   }
+// };
+
+// export const updateProviderRecords = async (
+//   req: express.Request,
+//   res: express.Response
+// ) => {
+//   try {
+//     const { providerId, records } = req.body; // Extract providerId and records from request body
+
+//     // Find the provider in the database
+//     const provider = await Provider.findById(providerId);
+//     if (!provider) {
+//       return res.status(404).json({ message: "Provider not found" });
+//     }
+
+//     // Update provider's records in MongoDB with the new records coming from the frontend
+//     provider.records = records;
+//     await provider.save();
+
+//     res.status(200).json({
+//       message: "Provider records updated successfully",
+//       records: provider.records,
+//     });
+//   } catch (error) {
+//     res.status(500).json({ message: "Error updating provider records", error });
+//   }
+// };

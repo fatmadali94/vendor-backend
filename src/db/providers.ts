@@ -57,6 +57,7 @@ interface IUser extends Document {
   resetPasswordExpires: Number;
   username: string;
   records: (MaterialRecord | PartRecord)[];
+  // updatedRecords: (MaterialRecord | PartRecord)[];
   role: "admin" | "provider" | "user";
   messages: mongoose.Schema.Types.ObjectId[] | (typeof MessageSchema)[]; // Updated to include messageSchema
   comments: Comment[]; // Array of comments
@@ -66,8 +67,13 @@ interface IUser extends Document {
     public_id?: string;
     url?: string;
   };
+  // updateImage: {
+  //   public_id?: string;
+  //   url?: string;
+  // }
   uploadedFiles: IUploadedFile[];
   matchPassword(enteredPassword: string): Promise<boolean>;
+  providerTickets: ObjectId[]; // Array of providerTickets ObjectIds
 }
 
 const providerSchema = new Schema<IUser>({
@@ -114,6 +120,16 @@ const providerSchema = new Schema<IUser>({
       required: false,
     },
   },
+  // updateImage: {
+  //   public_id: {
+  //     type: String,
+  //     required: false,
+  //   },
+  //   url: {
+  //     type: String,
+  //     required: false,
+  //   },
+  // },
   company_name: {
     type: String,
     required: false,
@@ -231,9 +247,46 @@ const providerSchema = new Schema<IUser>({
       },
     },
   ],
+  // updatedRecords: [
+  //   {
+  //     materialgroup: {
+  //       type: mongoose.Schema.Types.ObjectId,
+  //       ref: "MaterialGroups",
+  //       required: false,
+  //     },
+  //     materialname: {
+  //       type: mongoose.Schema.Types.ObjectId,
+  //       ref: "MaterialNames",
+  //       required: false,
+  //     },
+  //     materialgrade: {
+  //       type: mongoose.Schema.Types.ObjectId,
+  //       ref: "MaterialGrades",
+  //       required: false,
+  //     },
+  //   },
+  //   {
+  //     partgroup: {
+  //       type: mongoose.Schema.Types.ObjectId,
+  //       ref: "PartGroups",
+  //       required: false,
+  //     },
+  //     partname: {
+  //       type: mongoose.Schema.Types.ObjectId,
+  //       ref: "PartNames",
+  //       required: false,
+  //     },
+  //     partgeneralid: {
+  //       type: mongoose.Schema.Types.ObjectId,
+  //       ref: "PartGeneralIds",
+  //       required: false,
+  //     },
+  //   },
+  // ],
   messages: [MessageSchema], // Correct usage of messageSchema here
   ratings: [{ type: mongoose.Schema.Types.ObjectId, ref: "Rating" }],
   comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
+  providerTickets: [{ type: mongoose.Schema.Types.ObjectId, ref: "providerTickets" }],
 
   isVerified: { type: Boolean, default: false }, // Boolean f
   role: {
@@ -274,6 +327,28 @@ export const getVerifiedProviders = () => {
       path: "records.materialgrade",
       model: "MaterialGrades", // And for material grades
     })
+    .populate({
+      path: "records.partgroup",
+      model: "PartGroups", 
+    })
+    .populate({
+      path: "records.partname",
+      model: "PartNames", 
+    })
+    .populate({
+      path: "records.partgeneralId",
+      model: "PartGeneralId", 
+    })
+    .populate({
+      path: "ratings",
+      model: "Rating",
+      // select: "position companyId rating", // Only select specific fields from Rating
+    })
+    .populate({
+      path: "comments",
+      model: "Comment",
+      // select: "position companyId rating", // Only select specific fields from Rating
+    })
     .exec();
 
   return verifiedProviders;
@@ -291,6 +366,18 @@ export const getVerifiedProviderById = (id: any) =>
     .populate({
       path: "records.materialgrade",
       model: "MaterialGrades", // And for material grades
+    })
+    .populate({
+      path: "records.partgroup",
+      model: "PartGroups", 
+    })
+    .populate({
+      path: "records.partname",
+      model: "PartNames", 
+    })
+    .populate({
+      path: "records.partgeneralId",
+      model: "PartGeneralId", 
     })
     .populate({
       path: "ratings",

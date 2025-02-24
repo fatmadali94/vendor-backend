@@ -10,6 +10,7 @@ import {
   uploadUserFile,
   userForgotPassword,
   userResetPassword,
+  updateUserImage,
 } from "../controllers/users";
 import {
   resendProviderVerificationCode,
@@ -22,6 +23,8 @@ import {
   getAllProviders,
   uploadProviderFile,
   deleteUploadedFile,
+  // updateProviderImage,
+  // updateProviderRecords,
 } from "../controllers/providers";
 import { getMe } from "../controllers/auth";
 import { protect, authorize } from "../middlewares/authMiddleware";
@@ -38,6 +41,7 @@ export default (router: express.Router) => [
   router.post("/user-upload-file", uploadUserFile),
   router.post("/forgot-password", userForgotPassword),
   router.post("/reset-password", userResetPassword),
+  router.put("/update-profile-image", updateUserImage),
 
   // PROVIDERS ROUTES
   router.post("/provider-register", registerProvider),
@@ -50,6 +54,8 @@ export default (router: express.Router) => [
   router.get("/get-providers", getAllProviders),
   router.post("/provider-upload-file", uploadProviderFile),
   router.post("/provider-delete-file", deleteUploadedFile),
+  // router.put("/update-profile-image", updateProviderImage),
+  // router.put("/update-profile-record", updateProviderRecords),  
 
   // router.get("/verified-providers", getAllVerifiedProviders),
 

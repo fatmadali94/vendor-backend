@@ -15,7 +15,8 @@ import offer from "./offer";
 import products from "./products";
 import resourceCenter from "./resourceCenter";
 import marketInformation from "./marketInformation";
-import tickets from "./tickets";
+import userTickets from "./userTickets";
+import providerTickets from "./providerTickets";
 import rating from "./rating";
 import comment from "./comment";
 const router = express.Router();
@@ -37,7 +38,8 @@ export default (): express.Router => {
   products(router);
   resourceCenter(router);
   marketInformation(router);
-  tickets(router);
+  userTickets(router);
+  providerTickets(router);
   rating(router);
   comment(router);
 

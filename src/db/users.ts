@@ -54,14 +54,28 @@ interface IUser extends Document {
     url?: string;
   };
   ratings: ObjectId[]; // Array of rating ObjectIds
-  tickets: ObjectId[]; // Array of ticket ObjectIds
+  userTickets: ObjectId[]; // Array of userTickets ObjectIds
   uploadedFiles: IUploadedFile[];
+  updateImage: {
+    public_id?: string;
+    url?: string;
+  }
   matchPassword(enteredPassword: string): Promise<boolean>;
 }
 
 const userSchema = new Schema<IUser>(
   {
     image: {
+      public_id: {
+        type: String,
+        required: false,
+      },
+      url: {
+        type: String,
+        required: false,
+      },
+    },
+    updateImage: {
       public_id: {
         type: String,
         required: false,
@@ -175,7 +189,7 @@ const userSchema = new Schema<IUser>(
       default: "none"
     },
     ratings: [{ type: mongoose.Schema.Types.ObjectId, ref: "Rating" }],
-    tickets: [{ type: mongoose.Schema.Types.ObjectId, ref: "Ticket" }],
+    userTickets: [{ type: mongoose.Schema.Types.ObjectId, ref: "userTickets" }],
     isVerified: { type: Boolean, default: false }, // Boolean f
   },
   { timestamps: true }

@@ -94,13 +94,11 @@ export const registerUser = async (req: any, res: any) => {
   try {
     const verificationCode = crypto.randomBytes(3).toString("hex");
     const hashedPassword = await hashPassword(data.password);
-    console.log(data)
     let newUserData = {
       ...data,
       password: hashedPassword,
       verificationCode,
     };
-    console.log(newUserData)
     if (req.body.image) {
       const result = await cloudinary.uploader.upload(req.body.image, {
         folder: "verifiedUsers", // Upload to the "users" folder in Cloudinary
@@ -112,7 +110,6 @@ export const registerUser = async (req: any, res: any) => {
           url: result.secure_url,
         },       
       };
-      console.log(newUserData)
     }   
     const existingUser = await User.findOne({ email: newUserData.email });
     if (existingUser) {
@@ -286,3 +283,43 @@ export const updateUser = async (req: any, res: any) => {
       .json({ message: "An error occurred while updating the user." });
   }
 };
+
+export const updateUserImage = async (
+  req: express.Request,
+  res: express.Response
+) => {
+  try {
+    const { userId, image } = req.body; // Extract providerId and image from request body
+
+    // Find the user in the database
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Delete old image from Cloudinary if it exists
+    if (user.image?.public_id) {
+      await cloudinary.uploader.destroy(user.image.public_id);
+    }
+
+    // Upload new image to Cloudinary
+    const result = await cloudinary.uploader.upload(image, {
+      folder: "verifiedUsers",
+    });
+
+    // Update user's image in MongoDB
+    user.image = {
+      public_id: result.public_id,
+      url: result.secure_url,
+    };
+    await user.save();
+
+    res.status(200).json({
+      message: "Profile image updated successfully",
+      image: user.image,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error updating profile image", error });
+  }
+};
+
