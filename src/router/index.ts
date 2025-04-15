@@ -10,6 +10,8 @@ import partsGeneralIds from "./parts/partsGeneralIds";
 import partProviders from "./parts/partProviders";
 import getAll from "./getAll";
 import exhibition from "./exhibition";
+import digitalMagazine from "./digitalMagazine";
+import podcast from "./podcast";
 import messages from "./messages";
 import offer from "./offer";
 import products from "./products";
@@ -33,6 +35,8 @@ export default (): express.Router => {
   partProviders(router);
   getAll(router);
   exhibition(router);
+  digitalMagazine(router);
+  podcast(router);
   messages(router);
   offer(router);
   products(router);

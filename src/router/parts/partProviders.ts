@@ -14,3 +14,5 @@ export default (router: express.Router) => [
   router.patch("/partProvider/:id", updatePartProvider),
   router.post("/createPartProvider", createPartProvider),
 ];
+
+

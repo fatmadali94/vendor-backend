@@ -313,8 +313,8 @@ providerSchema.methods.matchPassword = async function (
 
 const Provider = mongoose.model<IUser>("Provider", providerSchema);
 
-export const getVerifiedProviders = () => {
-  const verifiedProviders = Provider.find()
+export const getVerifiedMaterialProviders = () => {
+  const verifiedMaterialProviders = Provider.find()
     .populate({
       path: "records.materialgroup",
       model: "MaterialGroups", // Ensures that Mongoose knows which model to use for population
@@ -327,18 +327,18 @@ export const getVerifiedProviders = () => {
       path: "records.materialgrade",
       model: "MaterialGrades", // And for material grades
     })
-    .populate({
-      path: "records.partgroup",
-      model: "PartGroups", 
-    })
-    .populate({
-      path: "records.partname",
-      model: "PartNames", 
-    })
-    .populate({
-      path: "records.partgeneralId",
-      model: "PartGeneralId", 
-    })
+    // .populate({
+    //   path: "records.partgroup",
+    //   model: "PartGroups", 
+    // })
+    // .populate({
+    //   path: "records.partname",
+    //   model: "PartNames", 
+    // })
+    // .populate({
+    //   path: "records.partgeneralId",
+    //   model: "PartGeneralId", 
+    // })
     .populate({
       path: "ratings",
       model: "Rating",
@@ -351,8 +351,51 @@ export const getVerifiedProviders = () => {
     })
     .exec();
 
-  return verifiedProviders;
+  return verifiedMaterialProviders;
 };
+
+export const getVerifiedPartProviders = () => {
+  const verifiedPartProviders = Provider.find()
+    .populate({
+      path: "records.materialgroup",
+      model: "MaterialGroups", // Ensures that Mongoose knows which model to use for population
+    })
+    .populate({
+      path: "records.materialname",
+      model: "MaterialNames", // Similarly, define the model for material names
+    })
+    .populate({
+      path: "records.materialgrade",
+      model: "MaterialGrades", // And for material grades
+    })
+    // .populate({
+    //   path: "records.partgroup",
+    //   model: "PartGroups", 
+    // })
+    // .populate({
+    //   path: "records.partname",
+    //   model: "PartNames", 
+    // })
+    // .populate({
+    //   path: "records.partgeneralId",
+    //   model: "PartGeneralId", 
+    // })
+    .populate({
+      path: "ratings",
+      model: "Rating",
+      // select: "position companyId rating", // Only select specific fields from Rating
+    })
+    .populate({
+      path: "comments",
+      model: "Comment",
+      // select: "position companyId rating", // Only select specific fields from Rating
+    })
+    .exec();
+
+  return verifiedPartProviders;
+};
+
+
 export const getVerifiedProviderById = (id: any) =>
   Provider.findById(id)
     .populate({

@@ -6,7 +6,7 @@ import {
   getPartProviders,
   PartProviderModel,
 } from "../../db/parts/partProviders";
-import { getVerifiedProviders } from "../../db/providers";
+import { getVerifiedPartProviders } from "../../db/providers";
 
 import cloudinary from "../../utils/cloudinary";
 
@@ -16,8 +16,8 @@ export const getAllPartProviders = async (
 ) => {
   try {
     const providers = await getPartProviders();
-    const verifiedProviders = await getVerifiedProviders();
-    const allProviders = [...providers, ...verifiedProviders];
+    const verifiedPartProviders = await getVerifiedPartProviders();
+    const allProviders = [...providers, ...verifiedPartProviders];
     return res.status(200).json(allProviders);
   } catch (error) {
     console.log(error);

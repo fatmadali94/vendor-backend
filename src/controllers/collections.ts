@@ -1,5 +1,5 @@
 import express from "express";
-import { PartProviderModel } from "../db/parts/partProviders";
+import { PartProviderModel, getPartProviders } from "../db/parts/partProviders";
 import {
   MaterialProviderModel,
   getMaterialProviders,
@@ -11,49 +11,7 @@ import { getPartGroups } from "../db/parts/partGroups";
 import { getPartGeneralIds } from "../db/parts/partGeneralIds";
 import { getPartNames } from "../db/parts/partNames";
 import { getProducts } from "../db/products";
-import { getVerifiedProviders } from "../db/providers";
-
-// export const getAllParts = () =>
-//   partGroupModel.find().populate({
-//     path: "partnames",
-//     populate: {
-//       path: "partgeneralids",
-//       populate: {
-//         path: "partproviders",
-//         model: "PartProviders",
-//       },
-//     },
-//   });
-// export const getAllMaterials = () =>
-//   materialGroupModel.find().populate({
-//     path: "materialnames",
-//     populate: {
-//       path: "materialgrades",
-//       populate: {
-//         path: "materialproviders",
-//       },
-//     },
-//   });
-// export const getAllMaterialProviders = () =>
-//   MaterialProviderModel.find()
-//     .populate("records.materialgroup")
-//     .populate("records.materialname")
-//     .populate("records.materialgrade");
-export const getAllPartProviders = () =>
-  PartProviderModel.find()
-    .populate({
-      path: "records.partgroup",
-      model: "PartGroups", // Ensures that Mongoose knows which model to use for population
-    })
-    .populate({
-      path: "records.partname",
-      model: "PartNames", // Similarly, define the model for material names
-    })
-    .populate({
-      path: "records.partgeneralid",
-      model: "PartGeneralIds", // And for material grades
-    })
-    .exec();
+import { getVerifiedMaterialProviders, getVerifiedPartProviders } from "../db/providers";
 
 export const getAll = async (req: express.Request, res: express.Response) => {
   try {
@@ -64,9 +22,10 @@ export const getAll = async (req: express.Request, res: express.Response) => {
     const partNames = await getPartNames();
     const partGeneralIds = await getPartGeneralIds();
     const materialProviders = await getMaterialProviders();
-    const partProviders = await getAllPartProviders();
+    const partProviders = await getPartProviders();
     const products = await getProducts();
-    const verifiedProviders = await getVerifiedProviders();
+    const verifiedMaterialProviders = await getVerifiedMaterialProviders();
+    const verifiedPartProviders = await getVerifiedPartProviders();
 
     const allArray = {
       materialProviders,
@@ -78,7 +37,8 @@ export const getAll = async (req: express.Request, res: express.Response) => {
       partNames,
       partGeneralIds,
       products,
-      verifiedProviders,
+      verifiedMaterialProviders,
+      verifiedPartProviders,
     };
     return res.status(200).json(allArray);
   } catch (error) {

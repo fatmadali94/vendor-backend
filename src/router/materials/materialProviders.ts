@@ -1,15 +1,15 @@
 import express from "express";
 import {
-  getAllProviders,
+  getAllMaterialProviders,
   deleteProvider,
   updateProvider,
   createProvider,
-  getProvider,
+  getMaterialProvider,
 } from "../../controllers/materials/materialProviders";
 
 export default (router: express.Router) => [
-  router.get("/materialProviders", getAllProviders),
-  router.get("/materialProvider/:id", getProvider),
+  router.get("/materialProviders", getAllMaterialProviders),
+  router.get("/materialProvider/:id", getMaterialProvider),
   router.delete("/materialProvider/:id", deleteProvider),
   router.patch("/materialProvider/:id", updateProvider),
   router.post("/createMaterialProvider", createProvider),

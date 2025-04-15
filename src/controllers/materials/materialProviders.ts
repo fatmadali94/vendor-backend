@@ -6,19 +6,18 @@ import {
   getMaterialProviders,
   MaterialProviderModel,
 } from "../../db/materials/materialProviders";
-import { getVerifiedProviders } from "../../db/providers";
+import { getVerifiedMaterialProviders } from "../../db/providers";
 
 import cloudinary from "../../utils/cloudinary";
 
-export const getAllProviders = async (
+export const getAllMaterialProviders = async (
   req: express.Request,
   res: express.Response
 ) => {
   try {
     const providers = await getMaterialProviders();
-    const verifiedProviders = await getVerifiedProviders();
-    const allProviders = [...providers, ...verifiedProviders];
-
+    const verifiedMaterialProviders = await getVerifiedMaterialProviders();
+    const allProviders = [...providers, ...verifiedMaterialProviders];
     return res.status(200).json(allProviders);
   } catch (error) {
     console.log(error);
@@ -151,7 +150,7 @@ export const createProvider = async (
   }
 };
 
-export const getProvider = async (
+export const getMaterialProvider = async (
   req: express.Request,
   res: express.Response
 ) => {
