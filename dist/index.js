@@ -14,7 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const http_1 = __importDefault(require("http"));
-const body_parser_1 = __importDefault(require("body-parser"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const compression_1 = __importDefault(require("compression"));
 const mongoose_1 = __importDefault(require("mongoose"));
@@ -22,7 +21,12 @@ const dotenv_1 = __importDefault(require("dotenv"));
 // import helmet from "helmet";
 const cors_1 = __importDefault(require("cors"));
 const googleDrive_1 = require("./utils/googleDrive"); // ✅ use Drive SDK stream method
+const googleDrive_2 = require("./utils/googleDrive");
 const router_1 = __importDefault(require("./router"));
+const i18next_1 = __importDefault(require("i18next"));
+const i18next_fs_backend_1 = __importDefault(require("i18next-fs-backend"));
+const i18next_http_middleware_1 = __importDefault(require("i18next-http-middleware"));
+const path_1 = __importDefault(require("path"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const corsOptions = {
@@ -43,8 +47,6 @@ app.use(express_1.default.static("public"));
 app.use(express_1.default.json({ limit: "100mb" }));
 app.use(express_1.default.urlencoded({ extended: true, limit: "100mb" }));
 app.use((0, cookie_parser_1.default)());
-app.use(body_parser_1.default.json({ limit: "50mb" }));
-app.use(body_parser_1.default.urlencoded({ limit: "50mb", extended: true }));
 // app.use(helmet());
 app.use((0, compression_1.default)());
 app.use((req, res, next) => {
@@ -57,30 +59,43 @@ app.use((req, res, next) => {
 });
 const server = http_1.default.createServer(app);
 const PORT = process.env.PORT || 3004;
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-});
+// app.listen(PORT, () => {
+//   console.log(`Server running on http://localhost:${PORT}`);
+// });
 // ✅ Connect to MongoDB
 mongoose_1.default.Promise = Promise;
 mongoose_1.default.connect(process.env.MONGO_URL, {
     maxPoolSize: 10,
+}).then(() => {
+    console.log("✅ MongoDB connected");
+    app.listen(PORT, () => {
+        console.log(`🚀 Server running on http://localhost:${PORT}`);
+    });
+}).catch((err) => {
+    console.error("❌ MongoDB connection failed:", err);
 });
 mongoose_1.default.connection.on("error", (error) => console.log(error));
-// ✅ Handle preflight request for the proxy route
-app.options("/proxy/pdf/:id", (req, res) => {
-    const origin = req.headers.origin;
-    if (origin === "http://localhost:5173" || origin === "https://vendor.rierco.net") {
-        res.setHeader("Access-Control-Allow-Origin", origin);
+// i18next config
+i18next_1.default
+    .use(i18next_fs_backend_1.default)
+    .use(i18next_http_middleware_1.default.LanguageDetector)
+    .init({
+    fallbackLng: 'en',
+    preload: ['en', 'fa', 'ar'],
+    backend: {
+        loadPath: path_1.default.join(__dirname, 'locales/{{lng}}/translation.json')
     }
-    res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-    res.setHeader("Access-Control-Allow-Credentials", "true");
-    res.sendStatus(200);
 });
+// Add i18next middleware to Express
+app.use(i18next_http_middleware_1.default.handle(i18next_1.default));
 // ✅ Secure and CORS-friendly Google Drive PDF streaming route
-app.get("/proxy/pdf/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.get("/server/proxy/pdf/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const fileId = req.params.id;
     yield (0, googleDrive_1.streamPDFfromDrive)(fileId, res); // ✅ use the SDK-based function
+}));
+app.get("/server/proxy/audio/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const fileId = req.params.id;
+    yield (0, googleDrive_2.streamAudioFromDrive)(fileId, req, res);
 }));
 // ✅ Your other API routes
 app.use("/server", (0, router_1.default)());

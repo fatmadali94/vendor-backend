@@ -14,7 +14,7 @@ const podcastSchema = new mongoose.Schema ({
     duration: {type: String},
     topics: [
       {
-        topic: { type: String, required: true }, // ✅ Topic name
+        topic: { type: String, required: true }, 
       }
     ],  
     sponsors: [{

@@ -16,6 +16,7 @@ const partProviders_1 = __importDefault(require("./parts/partProviders"));
 const getAll_1 = __importDefault(require("./getAll"));
 const exhibition_1 = __importDefault(require("./exhibition"));
 const digitalMagazine_1 = __importDefault(require("./digitalMagazine"));
+const podcast_1 = __importDefault(require("./podcast"));
 const messages_1 = __importDefault(require("./messages"));
 const offer_1 = __importDefault(require("./offer"));
 const products_1 = __importDefault(require("./products"));
@@ -39,6 +40,7 @@ exports.default = () => {
     (0, getAll_1.default)(router);
     (0, exhibition_1.default)(router);
     (0, digitalMagazine_1.default)(router);
+    (0, podcast_1.default)(router);
     (0, messages_1.default)(router);
     (0, offer_1.default)(router);
     (0, products_1.default)(router);

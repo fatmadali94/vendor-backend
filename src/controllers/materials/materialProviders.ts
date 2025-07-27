@@ -32,16 +32,17 @@ export const deleteProvider = async (
   try {
     const { id } = req.params;
     const provider: any = await deleteMaterialProviderById(id);
-    if (provider.image) {
-      const imgId = provider?.image?.public_id;
-      if (imgId) {
-        await cloudinary.uploader.destroy(imgId);
-      }
+
+    if (provider?.image?.public_id) {
+      await cloudinary.uploader.destroy(provider.image.public_id);
     }
 
-    return res.json(provider);
+    return res.json({
+      message: provider ? "Provider deleted successfully" : "Provider already removed",
+      provider,
+    });
   } catch (error) {
-    console.log(error);
+    console.error("❌ Error deleting provider:", error);
     return res.sendStatus(400);
   }
 };

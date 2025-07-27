@@ -14,9 +14,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateMagazine = exports.deleteMagazine = exports.getSingleMagazine = exports.getAllDigitalMagazine = exports.createMagazine = void 0;
 const digitalMagazine_1 = require("../db/digitalMagazine");
+const googleDrive_1 = require("../utils/googleDrive");
 const cloudinary_1 = __importDefault(require("../utils/cloudinary"));
 const slugify_1 = __importDefault(require("slugify"));
-const googleDrive_1 = require("../utils/googleDrive");
 /**
  * @desc Create a new Digital Magazine
  * @route POST /api/digitalMagazine

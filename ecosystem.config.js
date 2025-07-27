@@ -1,11 +1,11 @@
 module.exports = {
   apps: [
     {
-      name: "app1",
-      script: "./src/index.ts",
-      watch: true,
+      name: "vendor-backend",
+      script: "./dist/index.js", // Compiled file
+      watch: false,
       env: {
-        NODE_ENV: "development", // define env variables here
+        NODE_ENV: "production",
       },
     },
   ],

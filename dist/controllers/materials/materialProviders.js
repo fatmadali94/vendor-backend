@@ -35,16 +35,16 @@ const deleteProvider = (req, res) => __awaiter(void 0, void 0, void 0, function*
     try {
         const { id } = req.params;
         const provider = yield (0, materialProviders_1.deleteMaterialProviderById)(id);
-        if (provider.image) {
-            const imgId = (_a = provider === null || provider === void 0 ? void 0 : provider.image) === null || _a === void 0 ? void 0 : _a.public_id;
-            if (imgId) {
-                yield cloudinary_1.default.uploader.destroy(imgId);
-            }
+        if ((_a = provider === null || provider === void 0 ? void 0 : provider.image) === null || _a === void 0 ? void 0 : _a.public_id) {
+            yield cloudinary_1.default.uploader.destroy(provider.image.public_id);
         }
-        return res.json(provider);
+        return res.json({
+            message: provider ? "Provider deleted successfully" : "Provider already removed",
+            provider,
+        });
     }
     catch (error) {
-        console.log(error);
+        console.error("❌ Error deleting provider:", error);
         return res.sendStatus(400);
     }
 });
