@@ -17,7 +17,7 @@ import {
   validatePassword,
 } from "../utils/helpers";
 import cloudinary from "../utils/cloudinary";
-// import { sendSms } from "./smsService";
+import { sendSms } from "./smsService";
 
 dotenv.config();
 
@@ -91,34 +91,49 @@ export const getAllUsers = async (
 
 export const registerUser = async (req: any, res: any) => {
   const data = req.body;
+  console.log("🟢 Incoming registration data:", data);
+
   try {
     const verificationCode = crypto.randomBytes(3).toString("hex");
+    console.log("🔐 Generated verification code:", verificationCode);
+
     const hashedPassword = await hashPassword(data.password);
+    console.log("🔐 Hashed password created");
+
     let newUserData = {
       ...data,
       password: hashedPassword,
       verificationCode,
     };
+
+    // Upload image if provided
     if (req.body.image) {
+      console.log("🖼 Uploading image to Cloudinary...");
       const result = await cloudinary.uploader.upload(req.body.image, {
-        folder: "verifiedUsers", // Upload to the "users" folder in Cloudinary
+        folder: "verifiedUsers",
       });
+      console.log("✅ Image uploaded:", result.secure_url);
+
       newUserData = {
         ...newUserData,
         image: {
           public_id: result.public_id,
           url: result.secure_url,
-        },       
+        },
       };
-    }   
+    }
+
     const existingUser = await User.findOne({ email: newUserData.email });
     if (existingUser) {
+      console.warn("⚠️ User already registered:", newUserData.email);
       return res.status(409).json({ message: "کاربر ثبت شده است" });
     }
+
     const existingUnverifiedUser = await UnverifiedUser.findOne({
       email: newUserData.email,
     });
     if (existingUnverifiedUser) {
+      console.warn("⚠️ Unverified user already exists:", newUserData.email);
       return res.status(409).json({
         message:
           "درخواست شما قبلا ثبت شده است لطفا کد را وارد یا درخواست کد جدید دهید",
@@ -127,12 +142,39 @@ export const registerUser = async (req: any, res: any) => {
 
     const unverifiedUser = new UnverifiedUser(newUserData);
     await unverifiedUser.save();
+    console.log("✅ Unverified user saved to DB:", newUserData.email);
+
+    // ✅ Send email
+    console.log("📧 Sending verification email...");
     await sendVerificationEmail(unverifiedUser.email, verificationCode);
-    res.status(201).json({ message: "Verification email sent" });
-  } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.log("✅ Email sent to:", unverifiedUser.email);
+
+    // Try SMS but don't fail the whole request if it errors
+    let smsSent = false;
+    if (unverifiedUser.cellphone) {
+      const smsText = `کد تایید شما: ${verificationCode}`;
+      try {
+        console.log(`📱 Sending SMS to ${unverifiedUser.cellphone}: ${smsText}`);
+        await sendSms(unverifiedUser.cellphone, smsText);
+        smsSent = true;
+        console.log("✅ SMS sent successfully");
+      } catch (err: any) {
+        console.error("❌ Error sending SMS:", err?.message || err);
+      }
+    }
+
+
+    const message = smsSent
+      ? "Verification email and SMS sent"
+      : "Verification email sent";
+
+    return res.status(201).json({ message }); // ✅ single response + return
+  } catch (error: any) {
+    // Make sure to return here too
+    return res.status(400).json({ message: error?.message || "Something went wrong" });
   }
 };
+
 
 export const verifyUser = async (req: any, res: any) => {
   const { email, code } = req.body;
@@ -169,6 +211,15 @@ export const resendUserVerificationCode = async (req: any, res: any) => {
     await unverifiedUser.save();
 
     await sendVerificationEmail(unverifiedUser.email, verificationCode);
+    if (unverifiedUser.cellphone) {
+      const smsText = `کد تایید شما: ${verificationCode}`;
+      try {
+        console.log(`📱 Sending SMS to ${unverifiedUser.cellphone}: ${smsText}`);
+        await sendSms(unverifiedUser.cellphone, smsText);
+      } catch (err) {
+        console.error("❌ Error sending SMS:", err.message);
+      }
+    }
 
     res.status(200).json({ message: "کد تایید دوباره ارسال شد" });
   } catch (error) {

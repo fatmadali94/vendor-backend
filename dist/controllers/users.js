@@ -31,7 +31,7 @@ const unverifiedUsers_1 = __importDefault(require("../db/unverifiedUsers"));
 const emailService_1 = require("./emailService");
 const helpers_1 = require("../utils/helpers");
 const cloudinary_1 = __importDefault(require("../utils/cloudinary"));
-// import { sendSms } from "./smsService";
+const smsService_1 = require("./smsService");
 dotenv_1.default.config();
 const uploadUserFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -88,14 +88,20 @@ const getAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 exports.getAllUsers = getAllUsers;
 const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const data = req.body;
+    console.log("🟢 Incoming registration data:", data);
     try {
         const verificationCode = crypto_1.default.randomBytes(3).toString("hex");
+        console.log("🔐 Generated verification code:", verificationCode);
         const hashedPassword = yield (0, helpers_1.hashPassword)(data.password);
+        console.log("🔐 Hashed password created");
         let newUserData = Object.assign(Object.assign({}, data), { password: hashedPassword, verificationCode });
+        // Upload image if provided
         if (req.body.image) {
+            console.log("🖼 Uploading image to Cloudinary...");
             const result = yield cloudinary_1.default.uploader.upload(req.body.image, {
-                folder: "verifiedUsers", // Upload to the "users" folder in Cloudinary
+                folder: "verifiedUsers",
             });
+            console.log("✅ Image uploaded:", result.secure_url);
             newUserData = Object.assign(Object.assign({}, newUserData), { image: {
                     public_id: result.public_id,
                     url: result.secure_url,
@@ -103,23 +109,47 @@ const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         }
         const existingUser = yield users_1.default.findOne({ email: newUserData.email });
         if (existingUser) {
+            console.warn("⚠️ User already registered:", newUserData.email);
             return res.status(409).json({ message: "کاربر ثبت شده است" });
         }
         const existingUnverifiedUser = yield unverifiedUsers_1.default.findOne({
             email: newUserData.email,
         });
         if (existingUnverifiedUser) {
+            console.warn("⚠️ Unverified user already exists:", newUserData.email);
             return res.status(409).json({
                 message: "درخواست شما قبلا ثبت شده است لطفا کد را وارد یا درخواست کد جدید دهید",
             });
         }
         const unverifiedUser = new unverifiedUsers_1.default(newUserData);
         yield unverifiedUser.save();
+        console.log("✅ Unverified user saved to DB:", newUserData.email);
+        // ✅ Send email
+        console.log("📧 Sending verification email...");
         yield (0, emailService_1.sendVerificationEmail)(unverifiedUser.email, verificationCode);
-        res.status(201).json({ message: "Verification email sent" });
+        console.log("✅ Email sent to:", unverifiedUser.email);
+        // Try SMS but don't fail the whole request if it errors
+        let smsSent = false;
+        if (unverifiedUser.cellphone) {
+            const smsText = `کد تایید شما: ${verificationCode}`;
+            try {
+                console.log(`📱 Sending SMS to ${unverifiedUser.cellphone}: ${smsText}`);
+                yield (0, smsService_1.sendSms)(unverifiedUser.cellphone, smsText);
+                smsSent = true;
+                console.log("✅ SMS sent successfully");
+            }
+            catch (err) {
+                console.error("❌ Error sending SMS:", (err === null || err === void 0 ? void 0 : err.message) || err);
+            }
+        }
+        const message = smsSent
+            ? "Verification email and SMS sent"
+            : "Verification email sent";
+        return res.status(201).json({ message }); // ✅ single response + return
     }
     catch (error) {
-        res.status(400).json({ message: error.message });
+        // Make sure to return here too
+        return res.status(400).json({ message: (error === null || error === void 0 ? void 0 : error.message) || "Something went wrong" });
     }
 });
 exports.registerUser = registerUser;
@@ -157,6 +187,16 @@ const resendUserVerificationCode = (req, res) => __awaiter(void 0, void 0, void 
         unverifiedUser.verificationCode = verificationCode;
         yield unverifiedUser.save();
         yield (0, emailService_1.sendVerificationEmail)(unverifiedUser.email, verificationCode);
+        if (unverifiedUser.cellphone) {
+            const smsText = `کد تایید شما: ${verificationCode}`;
+            try {
+                console.log(`📱 Sending SMS to ${unverifiedUser.cellphone}: ${smsText}`);
+                yield (0, smsService_1.sendSms)(unverifiedUser.cellphone, smsText);
+            }
+            catch (err) {
+                console.error("❌ Error sending SMS:", err.message);
+            }
+        }
         res.status(200).json({ message: "کد تایید دوباره ارسال شد" });
     }
     catch (error) {

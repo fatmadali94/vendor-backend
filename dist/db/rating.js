@@ -38,6 +38,7 @@ const ratingSchema = new mongoose_1.Schema({
             "quality_control",
             "research_development",
             "quality_assurance",
+            "technical_office"
         ],
         required: true,
     },

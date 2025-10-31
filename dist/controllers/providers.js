@@ -32,6 +32,7 @@ const emailService_1 = require("./emailService");
 const unverifiedProviders_1 = __importDefault(require("../db/unverifiedProviders"));
 const helpers_1 = require("../utils/helpers");
 const cloudinary_1 = __importDefault(require("../utils/cloudinary"));
+const smsService_1 = require("./smsService");
 dotenv_1.default.config();
 const uploadProviderFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -95,46 +96,64 @@ const getAllProviders = (req, res) => __awaiter(void 0, void 0, void 0, function
 });
 exports.getAllProviders = getAllProviders;
 const registerProvider = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const data = req.body;
     try {
-        const processedRecords = data.records.map((record) => {
+        // Build records and remove empties
+        const processedRecords = (data.records || [])
+            .map((record) => {
             if (record.materialgroup || record.materialname || record.materialgrade) {
                 return {
                     materialgroup: record.materialgroup,
                     materialname: record.materialname,
-                    materialgrade: record.materialgrade
+                    materialgrade: record.materialgrade,
                 };
             }
-            else if (record.partgroup || record.partname || record.partgeneralid) {
+            if (record.partgroup || record.partname || record.partgeneralid) {
                 return {
                     partgroup: record.partgroup,
                     partname: record.partname,
-                    partgeneralid: record.partgeneralid
+                    partgeneralid: record.partgeneralid,
                 };
             }
-            return {};
-        });
+            return null;
+        })
+            .filter(Boolean);
         const verificationCode = crypto_1.default.randomBytes(3).toString("hex");
         const hashedPassword = yield (0, helpers_1.hashPassword)(data.password);
-        let unverifiedProvider;
-        if (req.body.image) {
+        let imagePayload = undefined;
+        if ((_a = req.body) === null || _a === void 0 ? void 0 : _a.image) {
             const result = yield cloudinary_1.default.uploader.upload(req.body.image, {
                 folder: "verifiedProviders",
             });
-            unverifiedProvider = new unverifiedProviders_1.default(Object.assign(Object.assign({}, data), { records: processedRecords, password: hashedPassword, verificationCode, image: {
-                    public_id: result.public_id,
-                    url: result.secure_url,
-                } }));
+            imagePayload = { public_id: result.public_id, url: result.secure_url };
         }
-        else {
-            unverifiedProvider = new unverifiedProviders_1.default(Object.assign(Object.assign({}, data), { records: processedRecords, password: hashedPassword, verificationCode }));
-        }
+        const unverifiedProvider = new unverifiedProviders_1.default(Object.assign(Object.assign(Object.assign({}, data), { records: processedRecords, password: hashedPassword, verificationCode }), (imagePayload ? { image: imagePayload } : {})));
         yield unverifiedProvider.save();
+        // Email is required for verification; fail early if it errors
         yield (0, emailService_1.sendVerificationEmail)(unverifiedProvider.email, verificationCode);
-        res.status(201).json({ message: "Verification email sent" });
+        // Try SMS but don't fail the whole request if it errors
+        let smsSent = false;
+        if (unverifiedProvider.cellphone) {
+            const smsText = `کد تایید شما: ${verificationCode}`;
+            try {
+                console.log(`📱 Sending SMS to ${unverifiedProvider.cellphone}: ${smsText}`);
+                yield (0, smsService_1.sendSms)(unverifiedProvider.cellphone, smsText);
+                smsSent = true;
+                console.log("✅ SMS sent successfully");
+            }
+            catch (err) {
+                console.error("❌ Error sending SMS:", (err === null || err === void 0 ? void 0 : err.message) || err);
+            }
+        }
+        const message = smsSent
+            ? "Verification email and SMS sent"
+            : "Verification email sent";
+        return res.status(201).json({ message }); // ✅ single response + return
     }
     catch (error) {
-        res.status(400).json({ message: error.message });
+        // Make sure to return here too
+        return res.status(400).json({ message: (error === null || error === void 0 ? void 0 : error.message) || "Something went wrong" });
     }
 });
 exports.registerProvider = registerProvider;
@@ -148,7 +167,7 @@ const verifyProvider = (req, res) => __awaiter(void 0, void 0, void 0, function*
         if (!unverifiedProvider) {
             return res.status(400).json({ message: "کد ورودی اشتباه می باشد" });
         }
-        const _a = unverifiedProvider.toObject(), { verificationCode } = _a, providerData = __rest(_a, ["verificationCode"]);
+        const _b = unverifiedProvider.toObject(), { verificationCode } = _b, providerData = __rest(_b, ["verificationCode"]);
         const provider = new providers_1.default(providerData);
         yield provider.save();
         // Remove the unverified provider from the UnverifiedUser collection
@@ -274,7 +293,7 @@ const getMe = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.getMe = getMe;
 const updateProvider = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _b;
+    var _c;
     try {
         const { userId, formData, records, image } = req.body;
         if (!userId) {
@@ -291,7 +310,7 @@ const updateProvider = (req, res) => __awaiter(void 0, void 0, void 0, function*
             provider.records = records;
         }
         if (image && typeof image === "object" && image.base64) {
-            if ((_b = provider.image) === null || _b === void 0 ? void 0 : _b.public_id) {
+            if ((_c = provider.image) === null || _c === void 0 ? void 0 : _c.public_id) {
                 yield cloudinary_1.default.uploader.destroy(provider.image.public_id);
             }
             const result = yield cloudinary_1.default.uploader.upload(image.base64, {

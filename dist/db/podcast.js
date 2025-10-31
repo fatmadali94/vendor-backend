@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updatePodcastById = exports.createNewPodcast = exports.deletePodcastById = exports.getPodcastById = exports.getPodcast = exports.podcastModel = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
+const constants_1 = require("../utils/constants");
 const podcastSchema = new mongoose_1.default.Schema({
     audioFile: {
         public_id: { type: String }, url: { type: String }
@@ -13,6 +14,12 @@ const podcastSchema = new mongoose_1.default.Schema({
     slug: { type: String, required: true, unique: true },
     title: { type: String, required: true },
     description: { type: String },
+    category: {
+        type: String,
+        enum: constants_1.PODCAST_CATEGORIES,
+        required: false,
+        index: true,
+    },
     year: { type: Number },
     month: { type: String },
     number: { type: Number },

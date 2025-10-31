@@ -5,10 +5,10 @@ import { getPodcast,
     deletePodcastById,
     createNewPodcast
  } from "../db/podcast";
+ import { podcastModel } from "../db/podcast";
 import cloudinary from "../utils/cloudinary";
  import slugify from "slugify";
 import { uploadAudioToDrive } from "../utils/googleDrive";
-
 
 
 export const createPodcast = async (req: express.Request, res: express.Response) => {
@@ -75,6 +75,7 @@ export const createPodcast = async (req: express.Request, res: express.Response)
         slug: req.body.slug || slugify(req.body.title, { lower: true, strict: true }),
         duration: req.body.duration,
         topics,
+        category: req.body.category,
         sponsors,
         narrator,
         image: {
@@ -93,15 +94,34 @@ export const createPodcast = async (req: express.Request, res: express.Response)
   
 
 
-  export const getAllPodcast = async (req: express.Request, res: express.Response) => {
-    try {
-      const podcasts = await getPodcast();
-      return res.status(200).json(podcasts);
-    } catch (error) {
-      console.error(error);
-      return res.sendStatus(400);
-    }
-  };
+  // export const getAllPodcast = async (req: express.Request, res: express.Response) => {
+  //   try {
+  //     const podcasts = await getPodcast();
+  //     return res.status(200).json(podcasts);
+  //   } catch (error) {
+  //     console.error(error);
+  //     return res.sendStatus(400);
+  //   }
+  // };
+  // GET /api/podcasts?category=usefulKnowledge
+export const getAllPodcast = async (req: express.Request, res: express.Response) => {
+  try {
+    const { category } = req.query as { category?: string };
+
+    const filter: Record<string, any> = {};
+    if (category) filter.category = category;
+
+    const podcasts = await podcastModel
+      .find(filter)
+      .sort({ createdAt: -1 }); // newest first
+
+    return res.status(200).json(podcasts);
+  } catch (error) {
+    console.error(error);
+    return res.sendStatus(400);
+  }
+};
+
 
   export const getSinglePodcast = async (req: express.Request, res: express.Response) => {
     try {

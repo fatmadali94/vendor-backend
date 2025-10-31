@@ -25,6 +25,7 @@ const commentSchema = new Schema<IComment>({
       "quality_control",
       "research_development",
       "quality_assurance",
+      "technical_office"
     ],
     required: true,
   },

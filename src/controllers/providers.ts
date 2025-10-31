@@ -16,6 +16,7 @@ import {
   validatePassword,
 } from "../utils/helpers";
 import cloudinary from "../utils/cloudinary";
+import { sendSms } from "./smsService";
 
 dotenv.config();
 
@@ -103,53 +104,75 @@ export const getAllProviders = async (
 
 export const registerProvider = async (req: any, res: any) => {
   const data = req.body;
+
   try {
-    const processedRecords = data.records.map((record: any) => {
-      if (record.materialgroup || record.materialname || record.materialgrade) {
-        return {
-          materialgroup: record.materialgroup,
-          materialname: record.materialname,
-          materialgrade: record.materialgrade
-        };
-      } else if (record.partgroup || record.partname || record.partgeneralid) {
-        return {
-          partgroup: record.partgroup,
-          partname: record.partname,
-          partgeneralid: record.partgeneralid
-        };
-      }
-      return {};
-    });
+    // Build records and remove empties
+    const processedRecords = (data.records || [])
+      .map((record: any) => {
+        if (record.materialgroup || record.materialname || record.materialgrade) {
+          return {
+            materialgroup: record.materialgroup,
+            materialname: record.materialname,
+            materialgrade: record.materialgrade,
+          };
+        }
+        if (record.partgroup || record.partname || record.partgeneralid) {
+          return {
+            partgroup: record.partgroup,
+            partname: record.partname,
+            partgeneralid: record.partgeneralid,
+          };
+        }
+        return null;
+      })
+      .filter(Boolean);
+
     const verificationCode = crypto.randomBytes(3).toString("hex");
     const hashedPassword = await hashPassword(data.password);
-    let unverifiedProvider;
-    if (req.body.image) {
+
+    let imagePayload: any = undefined;
+    if (req.body?.image) {
       const result = await cloudinary.uploader.upload(req.body.image, {
         folder: "verifiedProviders",
       });
-      unverifiedProvider = new UnverifiedProvider({
-        ...data,
-        records: processedRecords,
-        password: hashedPassword,
-        verificationCode,
-        image: {
-          public_id: result.public_id,
-          url: result.secure_url,
-        },
-      });
-    } else {
-      unverifiedProvider = new UnverifiedProvider({
-        ...data,
-        records: processedRecords,
-        password: hashedPassword,
-        verificationCode,
-      });
+      imagePayload = { public_id: result.public_id, url: result.secure_url };
     }
+
+    const unverifiedProvider = new UnverifiedProvider({
+      ...data,
+      records: processedRecords,
+      password: hashedPassword,
+      verificationCode,
+      ...(imagePayload ? { image: imagePayload } : {}),
+    });
+
     await unverifiedProvider.save();
+
+    // Email is required for verification; fail early if it errors
     await sendVerificationEmail(unverifiedProvider.email, verificationCode);
-    res.status(201).json({ message: "Verification email sent" });
-  } catch (error) {
-    res.status(400).json({ message: error.message });
+
+    // Try SMS but don't fail the whole request if it errors
+    let smsSent = false;
+    if (unverifiedProvider.cellphone) {
+      const smsText = `کد تایید شما: ${verificationCode}`;
+      try {
+        console.log(`📱 Sending SMS to ${unverifiedProvider.cellphone}: ${smsText}`);
+        await sendSms(unverifiedProvider.cellphone, smsText);
+        smsSent = true;
+        console.log("✅ SMS sent successfully");
+      } catch (err: any) {
+        console.error("❌ Error sending SMS:", err?.message || err);
+      }
+    }
+
+    const message = smsSent
+      ? "Verification email and SMS sent"
+      : "Verification email sent";
+
+    return res.status(201).json({ message }); // ✅ single response + return
+  } catch (error: any) {
+    // Make sure to return here too
+    return res.status(400).json({ message: error?.message || "Something went wrong" });
   }
 };
 

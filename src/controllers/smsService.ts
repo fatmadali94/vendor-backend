@@ -10,7 +10,7 @@ interface SendSmsResponse {
 }
 
 export const sendSms = async (
-  to: number,
+  to: string,
   message: string
 ): Promise<SendSmsResponse> => {
   const { SMS_USERNAME, SMS_PASSWORD, SMS_FROM } = process.env;
@@ -22,9 +22,9 @@ export const sendSms = async (
   try {
     // Prepare the data for the POST request
     const data = {
-      UserName: SMS_USERNAME,
-      Password: SMS_PASSWORD,
-      From: SMS_FROM,
+      UserName: process.env.SMS_USERNAME,
+      Password: process.env.SMS_PASSWORD,
+      From: process.env.SMS_FROM,
       To: to, // The recipient's phone number
       Message: message, // The message you want to send
     };
@@ -39,7 +39,7 @@ export const sendSms = async (
         },
       }
     );
-
+console.log("📨 SMS API Response:", response.data);
     // Handle the response
     if (response.data) {
       return response.data;

@@ -1,13 +1,21 @@
 import mongoose from "mongoose";
+import { PODCAST_CATEGORIES } from "../utils/constants";
 
 const podcastSchema = new mongoose.Schema ({
     audioFile: {
         public_id: { type: String }, url: { type: String } 
       },
     image: { public_id: { type: String }, url: { type: String } },
+    
     slug: { type: String, required: true, unique: true },
     title: { type: String, required: true },
     description: { type: String },
+     category: {
+      type: String,
+      enum: PODCAST_CATEGORIES, 
+      required: false,           
+      index: true,
+    },
     year: { type: Number },
     month: { type: String },
     number: { type: Number },

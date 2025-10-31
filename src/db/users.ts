@@ -37,10 +37,11 @@ interface IUser extends Document {
   sex: "man" | "woman" | "other";
   user_company: 
   | "none"
-  | "Kavir_tire"
-  | "Barez_tire"
-  | "Khoozestan_tire"
-  | "Kian_tire"
+  | "kavir_tire"
+  | "barez_tire"
+  | "barezkordestan_tire"
+  | "khoozestan_tire"
+  | "kian_tire"
   | "iran_tire"
   | "razi_tire"
   | "dena_tire"
@@ -174,10 +175,11 @@ const userSchema = new Schema<IUser>(
       type: String,
       enum: [
          "none",
-         "Kavir_tire",
-         "Barez_tire",
-         "Khoozestan_tire",
-         "Kian_tire",
+         "kavir_tire",
+         "barez_tire",
+         "barezkordestan_tire",
+         "khoozestan_tire",
+         "kian_tire",
          "iran_tire",
          "razi_tire",
          "dena_tire",

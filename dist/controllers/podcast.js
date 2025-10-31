@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updatePodcast = exports.deletePodcast = exports.getSinglePodcast = exports.getAllPodcast = exports.createPodcast = void 0;
 const podcast_1 = require("../db/podcast");
+const podcast_2 = require("../db/podcast");
 const cloudinary_1 = __importDefault(require("../utils/cloudinary"));
 const slugify_1 = __importDefault(require("slugify"));
 const googleDrive_1 = require("../utils/googleDrive");
@@ -67,6 +68,7 @@ const createPodcast = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             slug: req.body.slug || (0, slugify_1.default)(req.body.title, { lower: true, strict: true }),
             duration: req.body.duration,
             topics,
+            category: req.body.category,
             sponsors,
             narrator,
             image: {
@@ -83,9 +85,25 @@ const createPodcast = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.createPodcast = createPodcast;
+// export const getAllPodcast = async (req: express.Request, res: express.Response) => {
+//   try {
+//     const podcasts = await getPodcast();
+//     return res.status(200).json(podcasts);
+//   } catch (error) {
+//     console.error(error);
+//     return res.sendStatus(400);
+//   }
+// };
+// GET /api/podcasts?category=usefulKnowledge
 const getAllPodcast = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const podcasts = yield (0, podcast_1.getPodcast)();
+        const { category } = req.query;
+        const filter = {};
+        if (category)
+            filter.category = category;
+        const podcasts = yield podcast_2.podcastModel
+            .find(filter)
+            .sort({ createdAt: -1 }); // newest first
         return res.status(200).json(podcasts);
     }
     catch (error) {

@@ -25,9 +25,9 @@ const sendSms = (to, message) => __awaiter(void 0, void 0, void 0, function* () 
     try {
         // Prepare the data for the POST request
         const data = {
-            UserName: SMS_USERNAME,
-            Password: SMS_PASSWORD,
-            From: SMS_FROM,
+            UserName: process.env.SMS_USERNAME,
+            Password: process.env.SMS_PASSWORD,
+            From: process.env.SMS_FROM,
             To: to,
             Message: message, // The message you want to send
         };
@@ -37,6 +37,7 @@ const sendSms = (to, message) => __awaiter(void 0, void 0, void 0, function* () 
                 "Content-Type": "application/json",
             },
         });
+        console.log("📨 SMS API Response:", response.data);
         // Handle the response
         if (response.data) {
             return response.data;
