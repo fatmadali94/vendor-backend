@@ -62,7 +62,7 @@ const PORT = process.env.PORT || 3004;
 
 // ✅ Connect to MongoDB
 mongoose.Promise = Promise;
-mongoose.connect(process.env.MONGO_URL!, {
+mongoose.connect(process.env.MONGODB_URI!, {
   maxPoolSize: 10,
 }).then(() => {
   console.log("✅ MongoDB connected");

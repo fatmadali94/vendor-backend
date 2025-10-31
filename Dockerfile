@@ -1,0 +1,41 @@
+FROM node:18 AS builder
+
+WORKDIR /build
+
+COPY package*.json ./
+
+# Install build tools and dependencies
+RUN apt-get update && \
+    apt-get install -y python3 make g++ && \
+    npm install && \
+    npm rebuild bcrypt --build-from-source
+
+COPY . .
+
+RUN npm run build
+
+FROM node:18-slim
+
+WORKDIR /app
+
+# Install build essentials in the final image for bcrypt
+RUN apt-get update && \
+    apt-get install -y python3 make g++ && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /build/package*.json ./
+
+# Install production dependencies and rebuild bcrypt
+RUN npm install --production && \
+    npm rebuild bcrypt --build-from-source
+
+COPY --from=builder /build/dist ./dist
+COPY --from=builder /build/nodemon.json ./
+COPY google-drive-service-account.json ./
+
+EXPOSE 5000
+
+ENV NODE_PATH=dist
+ENV GOOGLE_SERVICE_ACCOUNT_PATH=/app/google-drive-service-account.json
+
+CMD ["npx", "nodemon"]
