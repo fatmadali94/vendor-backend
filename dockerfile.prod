@@ -2,7 +2,7 @@ FROM node:18 AS builder
 WORKDIR /build
 COPY package*.json ./
 
-# Install build tools and dependencies
+# Install build tools and ALL dependencies (including dev dependencies for build)
 RUN apt-get update && \
     apt-get install -y python3 make g++ && \
     npm ci && \
