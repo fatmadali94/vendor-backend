@@ -23,11 +23,10 @@ const app = express();
 const corsOptions = {
   origin: [
     "http://localhost:5173",
-    "https://demo-1.chiliscript.de",
-    "https://demo-2.chiliscript.de",
     "http://localhost:5174",
-    "https://vendor.rierco.net",
-    "https://adminvendor.rierco.net",   
+    
+    "https://vendor.rierco.net",       
+    "https://vendoradmin.rierco.net",   
   ],
   credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
