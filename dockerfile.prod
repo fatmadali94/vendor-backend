@@ -2,13 +2,16 @@ FROM node:18 AS builder
 WORKDIR /build
 COPY package*.json ./
 
-# Install build tools and ALL dependencies (including dev dependencies for build)
+# Install build tools and dependencies
 RUN apt-get update && \
     apt-get install -y python3 make g++ && \
     npm ci && \
     npm rebuild bcrypt --build-from-source
 
 COPY . .
+
+# Set memory limit (2GB should be enough with swap)
+ENV NODE_OPTIONS="--max-old-space-size=2048"
 RUN npm run build
 
 FROM node:18-slim

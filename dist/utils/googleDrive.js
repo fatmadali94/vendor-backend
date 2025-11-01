@@ -35,7 +35,7 @@ const uploadPDFtoDrive = (base64Data, filename) => __awaiter(void 0, void 0, voi
     const buffer = Buffer.from(cleanBase64, "base64");
     // 🔒 Create a temp file that will be automatically cleaned up
     const tempFile = tmp_1.default.fileSync({ postfix: path_1.default.extname(filename) });
-    fs_1.default.writeFileSync(tempFile.name, buffer);
+    fs_1.default.writeFileSync(tempFile.name, new Uint8Array(buffer));
     const media = {
         mimeType: mime_types_1.default.lookup(filename) || 'application/pdf',
         body: fs_1.default.createReadStream(tempFile.name),
@@ -121,7 +121,7 @@ const uploadAudioToDrive = (base64Data, filename) => __awaiter(void 0, void 0, v
     }
     const buffer = Buffer.from(matches[1], "base64");
     const tempFile = tmp_1.default.fileSync({ postfix: path_1.default.extname(filename) });
-    fs_1.default.writeFileSync(tempFile.name, buffer);
+    fs_1.default.writeFileSync(tempFile.name, new Uint8Array(buffer));
     const mimeType = mime_types_1.default.lookup(filename) || "audio/mpeg";
     const media = { mimeType, body: fs_1.default.createReadStream(tempFile.name) };
     const fileMetadata = {

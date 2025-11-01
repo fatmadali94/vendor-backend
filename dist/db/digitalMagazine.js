@@ -16,11 +16,11 @@ const MagazineSchema = new mongoose_1.default.Schema({
     number: { type: Number },
     topics: [
         {
-            topic: { type: String, required: true },
+            topic: { type: String, required: true }, // ✅ Topic name
             page: { type: Number, required: true }, // ✅ Related page number
         }
     ],
-    pages: [{ type: Number }],
+    pages: [{ type: Number }], // ✅ Store page numbers as an array
     advertisements: [{ public_id: { type: String }, url: { type: String } }],
     editorial: {
         name: { type: String },

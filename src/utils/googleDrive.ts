@@ -26,7 +26,7 @@ export const uploadPDFtoDrive = async (base64Data: string, filename: string) => 
   
   // 🔒 Create a temp file that will be automatically cleaned up
   const tempFile = tmp.fileSync({ postfix: path.extname(filename) });
-  fs.writeFileSync(tempFile.name, buffer);
+  fs.writeFileSync(tempFile.name, new Uint8Array(buffer));
 
   const media = {
     mimeType: mime.lookup(filename) || 'application/pdf',
@@ -123,7 +123,7 @@ export const uploadAudioToDrive = async (base64Data: string, filename: string) =
 
   const buffer = Buffer.from(matches[1], "base64");
   const tempFile = tmp.fileSync({ postfix: path.extname(filename) });
-  fs.writeFileSync(tempFile.name, buffer);
+  fs.writeFileSync(tempFile.name, new Uint8Array(buffer));
 
   const mimeType = mime.lookup(filename) || "audio/mpeg";
   const media = { mimeType, body: fs.createReadStream(tempFile.name) };

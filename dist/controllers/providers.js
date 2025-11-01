@@ -167,7 +167,7 @@ const verifyProvider = (req, res) => __awaiter(void 0, void 0, void 0, function*
         if (!unverifiedProvider) {
             return res.status(400).json({ message: "کد ورودی اشتباه می باشد" });
         }
-        const _b = unverifiedProvider.toObject(), { verificationCode } = _b, providerData = __rest(_b, ["verificationCode"]);
+        const _a = unverifiedProvider.toObject(), { verificationCode } = _a, providerData = __rest(_a, ["verificationCode"]);
         const provider = new providers_1.default(providerData);
         yield provider.save();
         // Remove the unverified provider from the UnverifiedUser collection
@@ -293,7 +293,7 @@ const getMe = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.getMe = getMe;
 const updateProvider = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _c;
+    var _a;
     try {
         const { userId, formData, records, image } = req.body;
         if (!userId) {
@@ -310,7 +310,7 @@ const updateProvider = (req, res) => __awaiter(void 0, void 0, void 0, function*
             provider.records = records;
         }
         if (image && typeof image === "object" && image.base64) {
-            if ((_c = provider.image) === null || _c === void 0 ? void 0 : _c.public_id) {
+            if ((_a = provider.image) === null || _a === void 0 ? void 0 : _a.public_id) {
                 yield cloudinary_1.default.uploader.destroy(provider.image.public_id);
             }
             const result = yield cloudinary_1.default.uploader.upload(image.base64, {

@@ -28,7 +28,7 @@ const sendSms = (to, message) => __awaiter(void 0, void 0, void 0, function* () 
             UserName: process.env.SMS_USERNAME,
             Password: process.env.SMS_PASSWORD,
             From: process.env.SMS_FROM,
-            To: to,
+            To: to, // The recipient's phone number
             Message: message, // The message you want to send
         };
         // Make the POST request to the SMS API

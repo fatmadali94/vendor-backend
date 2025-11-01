@@ -64,7 +64,7 @@ const PORT = process.env.PORT || 3004;
 // });
 // ✅ Connect to MongoDB
 mongoose_1.default.Promise = Promise;
-mongoose_1.default.connect(process.env.MONGO_URL, {
+mongoose_1.default.connect(process.env.MONGODB_URI, {
     maxPoolSize: 10,
 }).then(() => {
     console.log("✅ MongoDB connected");
@@ -80,8 +80,8 @@ i18next_1.default
     .use(i18next_fs_backend_1.default)
     .use(i18next_http_middleware_1.default.LanguageDetector)
     .init({
-    fallbackLng: 'en',
-    preload: ['en', 'fa', 'ar'],
+    fallbackLng: 'en', // fallback language
+    preload: ['en', 'fa', 'ar'], // preload all available languages
     backend: {
         loadPath: path_1.default.join(__dirname, 'locales/{{lng}}/translation.json')
     }

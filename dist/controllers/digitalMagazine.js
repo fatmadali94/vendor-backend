@@ -90,8 +90,8 @@ const createMagazine = (req, res) => __awaiter(void 0, void 0, void 0, function*
             slug: req.body.slug
                 ? (0, slugify_1.default)(req.body.slug, { lower: true, strict: true })
                 : (0, slugify_1.default)(req.body.title, { lower: true, strict: true }),
-            topics,
-            pages: pagesArray,
+            topics, // ✅ Save Topics Correctly
+            pages: pagesArray, // ✅ Save Only Manually Selected Pages
             image: { public_id: imageResult.public_id, url: imageResult.secure_url },
             pdf,
             advertisements: advertisementUrls,
@@ -151,7 +151,7 @@ exports.getSingleMagazine = getSingleMagazine;
  * @route DELETE /api/digitalMagazine/:id
  */
 const deleteMagazine = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _d, _e, _f;
+    var _a, _b, _c;
     try {
         const { id } = req.params;
         const deletedMagazine = yield (0, digitalMagazine_1.deleteMagazineById)(id);
@@ -159,9 +159,9 @@ const deleteMagazine = (req, res) => __awaiter(void 0, void 0, void 0, function*
             return res.status(404).json({ message: "Magazine not found" });
         }
         // Delete images from Cloudinary
-        if ((_d = deletedMagazine.image) === null || _d === void 0 ? void 0 : _d.public_id)
+        if ((_a = deletedMagazine.image) === null || _a === void 0 ? void 0 : _a.public_id)
             yield cloudinary_1.default.uploader.destroy(deletedMagazine.image.public_id);
-        if ((_e = deletedMagazine.pdf) === null || _e === void 0 ? void 0 : _e.public_id)
+        if ((_b = deletedMagazine.pdf) === null || _b === void 0 ? void 0 : _b.public_id)
             yield cloudinary_1.default.uploader.destroy(deletedMagazine.pdf.public_id, { resource_type: "raw" });
         if (deletedMagazine.advertisements) {
             yield Promise.all(deletedMagazine.advertisements.map((ad) => __awaiter(void 0, void 0, void 0, function* () {
@@ -169,7 +169,7 @@ const deleteMagazine = (req, res) => __awaiter(void 0, void 0, void 0, function*
                     yield cloudinary_1.default.uploader.destroy(ad.public_id);
             })));
         }
-        if ((_f = deletedMagazine.editorial) === null || _f === void 0 ? void 0 : _f.public_id) {
+        if ((_c = deletedMagazine.editorial) === null || _c === void 0 ? void 0 : _c.public_id) {
             yield cloudinary_1.default.uploader.destroy(deletedMagazine.editorial.public_id);
         }
         if (deletedMagazine.collectors) {

@@ -291,7 +291,7 @@ const userResetPassword = (req, res) => __awaiter(void 0, void 0, void 0, functi
 exports.userResetPassword = userResetPassword;
 const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const _b = req.body, { userId } = _b, updateData = __rest(_b, ["userId"]);
+        const _a = req.body, { userId } = _a, updateData = __rest(_a, ["userId"]);
         let user;
         user = yield users_1.default.findByIdAndUpdate(userId, updateData, { new: true });
         if (!user) {
@@ -307,7 +307,7 @@ const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
 });
 exports.updateUser = updateUser;
 const updateUserImage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _c;
+    var _a;
     try {
         const { userId, image } = req.body; // Extract providerId and image from request body
         // Find the user in the database
@@ -316,7 +316,7 @@ const updateUserImage = (req, res) => __awaiter(void 0, void 0, void 0, function
             return res.status(404).json({ message: "User not found" });
         }
         // Delete old image from Cloudinary if it exists
-        if ((_c = user.image) === null || _c === void 0 ? void 0 : _c.public_id) {
+        if ((_a = user.image) === null || _a === void 0 ? void 0 : _a.public_id) {
             yield cloudinary_1.default.uploader.destroy(user.image.public_id);
         }
         // Upload new image to Cloudinary
