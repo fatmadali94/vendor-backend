@@ -18,4 +18,4 @@ EXPOSE 5000
 ENV NODE_PATH=dist
 ENV GOOGLE_SERVICE_ACCOUNT_PATH=/app/google-drive-service-account.json
 
-CMD ["node", "dist/server.js"]
+CMD ["node", "dist/index.js"]
